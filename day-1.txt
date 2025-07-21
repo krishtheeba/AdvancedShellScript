@@ -1,0 +1,1084 @@
+Hello All
+
+Welcome to Advanced Shell Script Session - Day 1
+
+I'm Theeba - Instructor
+
+Will Start session by 9:30 AM IST
+
+================================================
+
+About Shell & Types
+
+Subshell
+
+
+Script
+------
+|-- Variables
+     |----> 1. User defined Variable
+     |----> 2. Shell Variables
+     |----> 3. Commandline Variables
+     |----> 2. Array
+
+|-- Operators
+     |----> 1. Arithmetic
+     |----> 2. Relational
+     |----> 3. Logical 
+     |----> 4. file test
+     |----> 5. regx (optional)
+
+
+|-- Conditional statement
+      |----> 1. if statement - 1) if only  2) if.. else   3) if elif
+      |----> 2. case statement
+
+|-- Looping statement
+      |---> 1. Conditional style
+      |----> 2. Collection style
+
+|---> File handling
+
+|---> Function
+         |---> simple function call, with args, scope , loadable script
+
+|---> Regular Expression ( grep, sed, awk)
+
+|--> sed + Regx
+        |-- print, delete, substitute, change,insert, append, execute...
+
+|--> awk + Regx
+       |------> commandline filter
+       |---> floating point operation
+       |---> report generation
+
+|--> Here document
+        |--> External script, SSH, DataBase
+
+
+    
+=============================================================================================================
+
+
+OS
+--
+
+User Appln
+
+===========
+
+OS (Kernel)
+
+==========
+Hardware
+
+
+
+Kernel-> File, Process
+
+File--> Data- under Storage device
+
+Process ->Data- Under CPU
+
+
+
+User Appln gcc javac sql vi  command task
+              ==========================
+                Shell
+======================================================
+			system call() = FD (File Descriptor)
+OS (Kernel)               |
+			Filesystem  <---> PCB |IPC; sched; Net; memory|
+                          |
+			Device Driver # kernel object file (.ko)  
+                         |
+                       Device Controller
+ 			|
+=====================================================
+Hardware  HD 
+
+
+date==> user
+|
+open()
+read()
+write(1,.. date result)
+..
+close()
+-------------------// systemcall
+
+FD=0  < STDIN>
+FD=1  <STDOUT>
+FD=2  <STDERR>
+
+FD=-1  failed call
+
+FD=OX43613   memory related call
+
+FD=3 to 2power 64
+
+
+-----------------------
+
+
+command > result.log   same as command 1> result.log
+
+command 2> result.log  
+        |-------------------------STDERR
+
+command 1> result.log 2> err.log
+
+
+redirect both command result and err msg to same file
+command > result.log 2>&1
+
+
+Shell
+=====
+Types of Shell
+=============
+1. Bourne Shell--> sh
+2. Korn Shell -> ksh
+3. CShell --> csh --> tcsh -> expect
+4. BourneAgainShell (BASH)-----GNU Project
+                               |
+                               default shell in any Linux 
+
+cat /etc/shells ==> List of Shell
+
+To test your Working Shell
+==========================
+
+1) ps 
+
+2) echo $0
+
+3) echo $SHELL
+
+
+parent process ( Wait)		-------resumes
+|					|
+Child Process======> R+  ===> Terminated-
+
+
+
+
+Linux Boot process
+==================
+
+OFF=> Switch ON==> POST => MasterBootRecord--> Boot Loader--> Load kernel-->Process
+
+Systemd  (PID=1)
+
+|
+
+login (?) getty(?) username password
+|
+shell (CLI)     VS Desktop
+
+
+Linux Command line
+==================
+
+1. command only style : ex:  uname 
+                             date 
+                             ls 
+                             ps
+
+2. command with arg
+
+echo "Today: date +%D"
+   |  ================
+ cmd         |--------arg
+
+3. command with command
+
+echo "Today: `date +%D`"
+
+
+===============================================================================================================
+
+
+Variable
+========
+|---User defined Variables
+
+variable=value
+|
+|---> variable start with a-zA-Z_
+|---> Not start with digits
+|---> cant contain space or special characters
+
+|---> There is no space = LHS,RHS
+
+
+myserver="Oracle Linux 8.3"
+
+count=`ps -e |wc -l`  (or)   count=$(ps -e|wc -l)
+
+
+
+Task
+====
+
+Initialize a filename "/etc/passwd" to user defined variable
+|
+use ls -l <variable> display file details
+|
+use stat < variable> display file attributes
+
+
+vi p1.sh
+|
+command mode
+|
+press i--> Insert Mode
+            |
+           {……..}
+
+press esc 
+|
+command mode
+|
+type        :wq<Enter>
+
+
+# Single line comment
+
+<<Label
+
+…
+…
+Label     Multiline comment
+
+
+			read
+Keyboard <STDIN> ------------------ Script------------------------Monitor<STDOUT>
+                                             echo
+
+
+Syntax:-
+------
+
+read UserdefinedVariable
+
+read var
+echo $var
+
+
+
+echo "Enter you name"   # interface to STDOUT
+read name  # interface to STDIN
+
+echo "hello.. $name" 
+
+vs
+
+read -p "Prompt message :"<space>UserdefinedVar
+
+read -p "Enter you name" name
+echo "Hello.. $name"
+
+
+
+Task
+====
+Read a filename from <stdin>
+
+Read a file Size from <stdin>
+
+Use find to see the file path
+
+display the Filename , File path and File Size.
+
+===================================================================
+
+SHELL Variable  (or)  env variable   (or) exported variable
+
+|-------> global variable
+
+
+var--> global
+
+export variablename=value     --->(1)
+
+(or)
+
+variablename=value
+export variablename        -------> (2)
+
+
+--> Converting UDV to SHELL variable
+  (or)  Global access for UDV
+
+
+---------------------------------------------------------
+
+read UDV
+
+export UDV=value
+
+unset UDV
+
+
+---------------------------------------------------------
+
+Operators
+=========
+|--> Arithmetic operator   + - * / %
+     -----------
+
+        |----> expr command
+                expr <operand><SPACE><Operator><SPACE><Operand>
+
+        |----> Compound Style    $((   ))
+
+
+Task
+====
+
+Write a shellscript
+
+-> read a filename from <STDIN>
+-> read a filesize from <STDIN>
+
+-> read another filename and its file size from <STDIN>
+
+-> Calculate the total size of files- sum of sizes
+
+-> Display each file name - size
+                 total size
+
+
+special variable -> $?
+-----------------------
+
+$? - last command execution exit code
+
+
+commandA
+commandB
+echo $?  ---> last exit status 
+commandc
+
+$? -> 0    Success
+
+$? - non-zero  ( 1 2 3.. 127 .. N)  // Failed
+
+
+Relational Operator
+==================
+
+|
+String  " A-Z a-z 0-9 space specialcharacter  "
+         -------------------------------------
+ 
+      == !=  < <= > >=
+
+loginname="`whoami`"  => Initialization
+
+$loginname == "root"  
+
+$loginname != "root"
+
+
+
+fname="my file.txt"
+
+
+| Numerical
+ ----------
+  -eq -ne  -lt  -gt  -le  -ge
+
+user_id =`id -u`
+
+user_id -eq 0
+
+$user_id -ne 0
+
+
+====================================================================
+
+Test Operator
+-------------
+
+test   (or)   []
+
+[<space>Expression<space>]   (or)   test<space>Expression
+
+
+========================================================================
+
+
+Conditional Statement
+---------------------
+
+|--> code block -> execute only once.
+
+|--> if statement
+
+1) if only
+===========
+
+if<space>[<space>Expression<space>] 
+then
+	<True Block>
+fi
+
+2) if else
+==========
+
+if<space>[ Expression ]
+then
+	True block
+else
+	False block
+
+
+3) if elif  elif… else
+========================
+
+if<space>[ Expression ]
+then
+	True block
+elif<space>[ Expression ]
+then 
+	True block2
+
+elif<space>[ Expression ]
+then 
+	True block2
+..
+else	
+	False block
+fi
+
+Task
+====
+
+Write a shell script
+
+|--> read a shell name from <STDIN>
+      |
+      Check whether shell name is bash
+       |
+       |--> read app name and port number from <stdin>
+       |--> Initialize web_app with app name and port number
+					     ex:  "Django:500"
+    |--> not a bash
+          |--> display Invalid message.
+
+============================================================
+
+if [ "$sh_var" == "bash" ]
+then
+        read -p "Enter Application Name : " app
+        read -p "Enter Port Number : " port
+
+        web_App="$app:$port"
+        echo "Web Url is : $web_App"
+else
+        echo "Sorry Your Shell name $sh_var is not bash "
+
+fi
+===========================================================
+
+
+Write a shell script
+
+|--> read a shell name from <STDIN>
+      |
+     Check whether shell name is "bash"---> Initialize profile=> /etc/bashrc
+      
+     Check whether shell name is "ksh"---> Initialize profile=> /etc/kshrc
+
+     Check whether shell name is "csh"---> Initialize profile=> /etc/cshrc
+     |
+  
+|- default shell name /bin/nologin and initialize profile as  /etc/profile
+
+|-> Display shell name & profile filename
+
+
+=====================================================================
+
+
+read -p "Enter the shell name: " sh_var
+
+if [ "$sh_var"  == "bash" ]
+then
+        fname="/etc/bashrc"
+elif [ "$sh_var" == "ksh" ]
+then
+        fname="/etc/kshrc"
+elif [ "$sh_var" == "csh" ]
+then
+        fname="/etc/cshrc"
+else
+        sh_var="/etc/nologin"
+        fname="/etc/profile"
+fi
+
+echo "Shell Name : $sh_var Profile filename : $fname"
+
+
+==========================================================
+
+port==> 500 to 1000
+
+$port -gt 500  -> 1
+
+$port  -lt 1000   --> 2
+
+
+if [ $port -gt 500 ]
+then
+	if [ $port -lt 1000 ]
+	then
+		…
+	fi
+fi
+
+$shell == "bash"  or   $shell == "ksh"
+
+Single conditional statement, test more than 1 condition, use logical operator
+
+
+Logical operator
+================
+
+logical AND -->   -a
+
+logical OR --->   -o
+
+logical Not --->   !
+
+
+
+test 501-999
+
+if<space>[ $port -gt 500  -a    $port -lt 1000 ]
+then
+	True block
+else
+	False block
+fi
+
+
+if<space>[ $sh_var == "bash" -o $sh_var == "ksh" ]
+then
+	True block
+else
+	False block
+
+fi
+
+
+if ![ condition ]
+then
+	…
+fi
+
+Task
+-----
+Write a shell script
+	read a shell name
+	|
+	Check whether shell is bash
+        |
+	read app name from <STDIN>
+	|
+	test app name is Flask (or) Django 
+			|       # any one matched
+			|
+			read a port number 
+			|
+			test input port range 501-599
+			|
+			display app name and port number
+
+===========================================================
+read -p "Enter the Shell name: " sh_var
+
+if [ "$sh_var" == "bash" ]
+then
+        read -p "Enter the Application Name: " app
+        if [ "$app" == "Flask" -o "$app" == "Django" ]
+        then
+                read -p "Enter the Port Number: " port
+                if [ $port -gt 500 -a $port -lt 600 ]
+                then
+                        web_app="$app:$port"
+                        echo "Web Url is : $web_app"
+                else
+                        echo "Sorry $port is Not Valid"
+                fi
+        else
+       
+        echo "Sorry input Shell name is not bash"
+fi
+
+
+
+=========================================================
+
+
+test operator ---->   [ ]
+
+
+expanded test operator ---->  [[  ]]
+
+
+[ "`whoami` == "root" -a "`$SHELL" == "bash" ]
+
+
+
+[ "`whoami` == "root" -a "`$SHELL" == "bash" -a  `ps -e|wc -l` -gt 100   -a `lsmod|wc -l` -gt 200 ]
+
+---------------------     ------------------     ---------------------       ---------------------
+
+|------------------------------------------|     |--------------------------------------------------|
+
+               |-------------------------------------------------------|
+				|
+		         Final result
+
+
+[ "`whoami` == "root" -a "`$SHELL" == "bash" ] -a  [ `ps -e|wc -l` -gt 100   -a `lsmod|wc -l` -gt 200 ]
+----------------------------------------------------------------------------------------------------------  Error
+
+
+
+[ "`whoami` == "root" -a "`$SHELL" == "bash" ] &&  [ `ps -e|wc -l` -gt 100   -a `lsmod|wc -l` -gt 200 ]
+
+
+
+====================================================================================================================
+[root@node2 day1]# [ 150 -gt 100 -a 150 -lt 100 ]
+[root@node2 day1]# echo $?
+1
+[root@node2 day1]# [ 150 -gt 100 ] -a [ 150 -lt 100 ]
+-bash: [: too many arguments
+[root@node2 day1]#
+[root@node2 day1]# [ 150 -gt 100 ] && [ 150 -lt 100 ]
+[root@node2 day1]#
+[root@node2 day1]# echo $?
+1
+[root@node2 day1]# [ 150 -gt 100 &&  150 -lt 100 ]
+-bash: [: missing `]'
+[root@node2 day1]#
+[root@node2 day1]# [[ 150 -gt 100 &&  150 -lt 100 ]]
+[root@node2 day1]#
+[root@node2 day1]# echo $?
+1
+[root@node2 day1]# [[ 150 -gt 100 -a  150 -lt 100 ]]
+-bash: syntax error in conditional expression
+-bash: syntax error near `-a'
+[root@node2 day1]#
+
+
+
+[ "`whoami` == "root" -a "`$SHELL" == "bash" ] &&  [ `ps -e|wc -l` -gt 100   -a `lsmod|wc -l` -gt 200 ]  // ok
+
+
+
+[ "`whoami` == "root" && "`$SHELL" == "bash" ] &&  [ `ps -e|wc -l` -gt 100   && `lsmod|wc -l` -gt 200 ]  // Error
+
+
+[[ "`whoami` == "root" && "`$SHELL" == "bash" ] &&  [ `ps -e|wc -l` -gt 100   && `lsmod|wc -l` -gt 200 ]]  // ok
+
+
+
+===================================================================================================================
+
+echo $? --> 0 (Success)
+
+1...127..N --> 
+
+
+if [ 10 ]
+then
+	echo True  -> True
+else
+	echo False
+fi
+
+
+if [ "" ]    # empty string --> no value
+then
+	echo True  
+else
+	echo False ---> False
+fi
+
+
+[ $? -eq 0 ]
+
+
+
+task
+=====
+Write a shell script
+
+|
+read a system command from <STDIN>
+	|
+	execute the input command - redirect command results( STDOUT, STDERR) to same external file
+	|
+	display command execution status to monitor.
+
+==================================================================================================
+
+read -p "Enter a Linux Command: " cmd
+$cmd > result.log 2>&1
+
+if [ $? -eq 0 ];then
+	echo "$cmd execution is success"
+else
+	echo "$cmd execution Failed."
+	echo "Refer result.log file"
+fi
+===================================================================================================
+
+
+if [ "" ];then
+	echo True  
+else
+	echo False ---> False
+fi
+
+===================================================================
+
+
+Admin Activity
+-------------
+1st Validation----> script running user is root or not
+                                                  ----
+                                                   |----- exit from script
+
+
+
+[ "`whoami`"   == "root" ]   --> (1)
+
+(or)
+
+[ `id -u` -eq 0 ]    ---> (2)
+
+(or)
+
+$UID
+
+
+
+2. execute admin command
+
+|
+3. redirect command to external log file- append mode
+      |---- update date/time
+
+===================================================================
+
+
+
+Ol7 -- yum
+
+Ol[89] -- dnf
+
+Debian - > apt-get
+
+
+if  ![ "`whoami`" == "root" ]
+then
+	echo "Usage : Sorry you are not root user"
+	exit
+fi
+
+yum -y install <packagename> >> /var/log/repo.log
+|
+
+if [ $? -eq 0 ]
+ |
+     Success Installation
+     systemctl status atd > process.log 2>&1
+      |
+       if [ $? -ne 0 ]
+		|
+		systemctl start atd
+		|
+		if [ $? -eq 0 ]
+			|----> Success atd is active state"
+		else
+			|----> Daemon startup failed
+	else
+		daemon is Active
+
+else
+	Sorry package installation failed
+fi
+
+
+
+============================================================
+
+
+
+if ![ "`whoami`" == "root" ]
+then
+        echo "Usage: Sorry You are Not root user"
+        exit
+fi
+
+
+
+rpm -qa | grep -wq "at"
+
+if ![ $? -eq 0 ];then
+	echo "Package already exist/ installed"
+	exit
+else
+	yum -y install at >> /var/log/repo.log 2>&1
+
+	if [ $? -eq 0 ];then
+        	echo "Installation is done."
+	        systemctl status atd> process.log 2>&1
+
+        	if [ $? -ne 0 ];then
+                	systemctl start atd
+                	if [ $? -eq 0 ];then
+                        	echo "Success atd is active state"
+                	else
+                        	echo "atd startup failed"
+                	fi
+        	else
+                	echo "atd daemon is Active"
+        	fi
+	else
+        	echo "Sorry Package installation fails "
+        	echo "refer /var/log/repo.log"
+        	exit
+	fi
+
+
+fi
+====================================================================================================================================
+read -p "Enter a number" var
+
+if [ -z $var]
+then
+	echo "No input Input"
+fi
+  
+==================================================================================================================================
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
