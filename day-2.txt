@@ -1,0 +1,996 @@
+File test operator
+------------------
+
+|-----------> File types and file operations
+                             ----------------
+                               |
+                            read   write   execute
+
+file <filename>
+|
+determine file type
+
+File type
+----------
+1. Regular File (or) Ordinary file
+--------------------------------------
+  |--->  ASCII / TEXT    - user can read---> ex: p1.java p1.sh   p1.txt
+  |--->  ELF (object file) - user cant read -> ex: /bin/<command>
+                                                   gcc -o p1 p1.c
+                                                           |  |----- ASCII
+                                                           ELF
+2.  Directory
+
+3. Link File < Soft link file > or <symbolic link>  # ln -s <source> <target>
+
+4. Device type
+      |----------------Character type device - ex: keyboard terminal   /dev
+      |----------------Block type device -  ex: /dev/sda1
+
+5. named pipe
+
+7. socket file
+
+
+
+File Test operator
+------------------
+Reg file  -> -f
+
+Directory file -> -d
+
+link file  -> -h
+
+character type file ->   -c
+
+block type    ->  -b
+
+named pipe  -->   -p
+
+Socket file ->   -S
+
+
+read mode -> -r
+
+write mode -> -w
+
+execute mode -> -x
+
+
+Syntax:-
+
+[<space>FileTestOperator<space>InputFile<space>]
+
+
+[ -f p1.log ]    => test p1.log is reg or not
+
+[ -d demo ]   => test demo is directory or not
+
+[ -c /dev/null ] => "  /dev/null is character type file
+
+[ -b /dev/sda1 ]
+
+[ -r file.log ]
+
+[ -w p1.log ]
+
+[ -x p1.sh ]
+
+
+[ -e <filename> ] -----> Test filename exist or not
+ 
+
+Task
+====
+1. Write a shell script
+		|
+		read a filename from <STDIN>
+                 |
+		Test whether file exist or not
+				   |
+				use file command - determine filetype
+
+=======================================================================================
+
+2. Write a shell script
+		|
+		read a filename from <STDIN>
+		|
+		Test input file exist or not
+				|
+				|-----> Test input file is regular file or not
+								|
+								ls -l <filename>
+				|-----> Test input file is directory file or not
+							       |
+                                                               ls -ld <filename>
+				|----->use file command to determine file type
+
+=========================================================================================
+
+3. Write a Shell Script
+             |
+            read a filename from <STDIN>
+
+            test filename is reg. file or not  --> exit from script
+				|
+				|
+				read a search pattern as input from <STDIN>
+   
+				use grep command- search pattern
+					- pattern not matched - display suitable msg
+
+===============================================================================================
+		 
+#task1:
+
+read -p "Enter a file name: " fname
+
+if [ -e $fname ]
+then
+        echo "Yes input File: $fname exist"
+else
+        echo "Sorry input file: $fname not exist"
+fi
+
+==============================================================================================
+
+#task2:
+read -p "Enter a file name: " fname
+
+if [ -e $fname ]
+then
+        if [ -f $fname ];then
+                echo "Input File: $fname is a Regular file"
+                ls -l $fname
+        elif [ -d $fname ];then
+                echo "Input file: $fname is a Directory file"
+                ls -ld $fname
+        else
+                echo "Yes input file: $fname exist"
+                file $fname
+        fi
+else
+        echo "Sorry input file: $fname not exist"
+fi
+
+
+===============================================================================================
+
+#task3:
+read -p "Enter a file name: " fname
+
+if ! [ -f $fname ]
+then
+        echo "Sorry input file: $fname is NOT a regular file"
+fi
+
+
+read -p "Enter a search pattern : " key
+
+
+grep $key $fname
+
+
+if [ $? -ne 0 ];then
+        echo "Usage: Sorry given pattern $key is not matched in file $fname"
+fi
+
+====================================================================================================
+
+
+
+To check input is empty:
+
+[root@node2 day2]# if [ $name ];then
+> echo "Hello ... $name"
+> else
+> echo "Input cant be Empty. pls enter value"
+> fi
+Input cant be Empty. pls enter value
+
+================================================================================================
+
+if ! [ $name ]; then
+	echo "Input Missing"
+fi
+================================================================================================
+
+
+case statement
+==============
+	|- Conditional statement
+	|- code block - execute only once
+
+Syntax:-
+	
+case variable in
+
+pattern1) pattern1 operation ;;
+pattern2) pattern2 operation ;;
+;;
+;;
+pattern) pattern operation ;;
+
+*) default operation
+esac
+
+
+# case in esac - keywords
+
+
+
+if [ $port -gt 500 -a $port -lt 600 ]
+then
+	
+	case variable in
+
+	pattern1) pattern1 operation ;;
+	pattern2) pattern2 operation ;;
+	...
+	pattern) pattern operation ;;
+
+	*) default operation
+	esac
+
+else
+	case variable in
+
+	pattern1) pattern1 operation ;;
+	pattern2) pattern2 operation ;;
+	...
+	patterxn) pattern operation ;;
+
+	*) default operation
+	esac
+
+fi
+
+======================================================================================================
+
+
+Looping Statement
+=================
+
+|--> Code block - execute more than 1 time
+
+1. Conditional style looping - based on condition
+
+2. Collection style looping - based on < no. of line>
+
+
+
+1. Conditional style looping
+============================
+    while ; until   // keywords
+
+Syntax:-
+------
+
+while<space>[ condition ]
+do
+	<code block>
+	Arithmetic 
+done
+
+(or)
+
+while<space>[[ condition ]]
+do
+	<code block>
+	Arithmetic 
+done
+
+
+while true; do
+	read -p "Type exit to quit" cmd
+	if [[ "$cmd" == "exit" ]]; then
+		break  # exit from loop   
+	fi
+done
+	
+==================================================================================================
+[root@node2 day2]# count=1
+[root@node2 day2]# while [ $count -le 5 ];
+> do
+> echo "Count is : $count"
+> ((count++))
+> done
+Count is : 1
+Count is : 2
+Count is : 3
+Count is : 4
+Count is : 5
+[root@node2 day2]# input=""
+[root@node2 day2]#
+[root@node2 day2]# while [[ -z "$input" ]];do
+> read -p "Enter something" input
+> done
+Enter somethings
+=================================================================================================
+task
+====
+
+Write a Shell Script
+	|
+	read a login from <STDIN>
+                |
+		test login name is userA or not--> Try Again
+		 |
+		Login matched
+
+
+Attempt max limit is 3.
+---------------------------------------------------------------------------------------------
+
+c=0
+while [ $c -lt 3 ]
+do
+        c=`expr $c + 1`
+
+        read -p "Enter the Login name " name
+
+        if [ "$name" == "userA" ];then
+                echo "Login Matched"
+                break # exit from loop
+        else
+                echo "Try-Again"
+        fi
+done
+
+
+-------------------------------------------------------------------------------------------
+break - exit from loop
+
+continue - ignore current iteration and continues with the next iteration
+-----------------------------------------------------------------------------------------------------
+
+
+until loop
+---------
+|--> opp. to while loop
+
+
+
+while ! [ condition ]        =>same as  until
+do
+	<code block>
+done
+
+
+[root@node2 day2]# until [[ -n $name ]];do
+> read -p "Enter name" name
+> done
+Enter name
+Enter name
+Enter name
+Enter name
+Enter name
+Enter namehari
+
+
+======================================================================================================
+
+2. Collection style loop
+-------------------------------
+                    |---------- based on < no. of line>
+                    |---> for, select
+
+|-> for loop
+
+syntax:-
+
+for variable in <collection>
+do
+	<code block>
+done
+
+# for in do done  keywords
+
+
+============================================================================================
+
+select loop
+    |----- collection style loop
+    |----- menu driven programming
+    |----- always running
+
+
+syntax:-
+
+select variable in collection
+
+do
+	<code block>
+done
+
+#select in do done keywords
+--------------------------------------------------------------------------------------
+for var in D1 D2 D3
+> do
+> echo "var value is : $var"
+> done
+var value is : D1
+var value is : D2
+var value is : D3
+[root@node2 day2]#
+[root@node2 day2]# select var in D1 D2 D3; do echo "var value is : $var"; done
+1) D1
+2) D2
+3) D3
+#? 1
+var value is : D1
+#? 3
+var value is : D3
+#? 2
+var value is : D2
+#?
+1) D1
+2) D2
+3) D3
+#?
+
+-------------------------------------------------------------------------------
+
+In shell script--------------> select + case  ==> menu driven programming
+
+
+select variable in menu1 menu2 menu3
+do
+	case $variable1 in
+	menu1) menu1 operation ;;
+	menu1) menu2 operation ;;
+	..
+	menuN) menuN operation ;;
+	*) default operation
+	esac
+done
+
+========================================================================================================
+	
+
+select var in files process fsmount memory quit
+do
+        case $var in
+        files) echo " List of files:-"
+                ls -l
+                echo "Exit from file menu"
+                ;;
+        process)
+                echo "Current Process"
+                ps
+                echo "Exit from process menu"
+                ;;
+        fsmount)
+                echo "Mounted filesystem:"
+                df -Th
+                ;;
+        memory) echo "Current memory report :-"
+                free
+                ;;
+        quit) echo "Thankyou" ; break
+                ;;
+        *) echo "Sorry your input not matched"
+        esac
+done
+
+=============================================================================================================
+
+PS3="
++++++++++++++++++++++++++++
++	1.files		  +
++       2.process	  +
++       3.fsmount         +
++       4.memory          +
++       5.quit            +
++++++++++++++++++++++++++++
+
+Select your Choice : "
+
+select var in files process fsmount memory quit
+do
+        case $var in
+        files) echo " List of files:-"
+                ls -l
+                echo "Exit from file menu"
+                ;;
+        process)
+                echo "Current Process"
+                ps
+                echo "Exit from process menu"
+                ;;
+        fsmount)
+                echo "Mounted filesystem:"
+                df -Th
+                ;;
+        memory) echo "Current memory report :-"
+                free
+                ;;
+        quit) echo "Thankyou" ; break
+                ;;
+        *) echo "Sorry your input not matched"
+        esac
+done
+===============================================================================================================
+
+File Handling
+=============
+
+Keyboard<STDIN>----------------- read  ------ Script-------- echo ----- Monitor <STDOUT>
+                                                |
+                                                |
+                                             <file> Storage
+
+
+1. read data from <File> ---> script ---> display to monitor
+
+2. Script ---> create a new file and write data to FILE
+
+3. read from <ONE file> --- to script--- create a new file and write data to <ANOTHERFILE>
+
+
+while loop + redirection symbols
+
+< - read
+> - create and write
+>> - append
+
+
+1. read data from <File> ---> script ---> display to monitor
+=============================================================
+
+Syntax:-
+
+	while read var
+	do
+		<code block>
+	done<inputfile
+
+
+
+--------------------------------------------------------------------------------
+[root@node2 day2]# read var
+data1
+[root@node2 day2]# echo "---> $var"
+---> data1
+[root@node2 day2]#
+[root@node2 day2]# while read var
+> do
+> echo  "--> $var"
+> done
+
+-->
+data
+--> data
+ggg
+--> ggg
+dklsjd
+--> dklsjd
+sdsd
+--> sdsd
+dhf
+--> dhf
+ddj
+--> ddj
+[root@node2 day2]# ps
+    PID TTY          TIME CMD
+   1269 pts/0    00:00:00 bash
+   1339 pts/0    00:00:00 ps
+[root@node2 day2]# ps|while read var
+> do
+> echo "---> $var"
+> done
+---> PID TTY          TIME CMD
+---> 1269 pts/0    00:00:00 bash
+---> 1340 pts/0    00:00:00 ps
+---> 1341 pts/0    00:00:00 bash
+[root@node2 day2]# cat emp.csv
+101,raj,sales,pune,1000
+102,Sam,hr,Pune,2000
+103,Ravi,sales,Pune,3000
+104,Susi,hr,Kolkata,4000
+105,Kumar,prod,Pune,4000
+106,theeba,prod,bengaluru,2000
+110,vishnu,sales,bengaluru,5000
+
+[root@node2 day2]# cat emp.csv| while read var
+> do
+> echo "---> $var"
+> done
+---> 101,raj,sales,pune,1000
+---> 102,Sam,hr,Pune,2000
+---> 103,Ravi,sales,Pune,3000
+---> 104,Susi,hr,Kolkata,4000
+---> 105,Kumar,prod,Pune,4000
+---> 106,theeba,prod,bengaluru,2000
+---> 110,vishnu,sales,bengaluru,5000
+--->
+[root@node2 day2]# while read var
+> do
+> echo "---> $var"
+> done<emp.csv
+---> 101,raj,sales,pune,1000
+---> 102,Sam,hr,Pune,2000
+---> 103,Ravi,sales,Pune,3000
+---> 104,Susi,hr,Kolkata,4000
+---> 105,Kumar,prod,Pune,4000
+---> 106,theeba,prod,bengaluru,2000
+---> 110,vishnu,sales,bengaluru,5000
+
+------------------------------------------------------------------------------------
+
+
+2. Script ---> create a new file and write data to FILE
+=======================================================
+
+
+while read var
+do
+	code block
+done > newfile
+
+
+command > newfile
+
+
+i=0
+while [ $i -lt 5 ]
+do
+        uptime
+        sleep 1
+        ps -f
+        sleep 1
+
+        i=`expr $i + 1`
+done> r1.log
+
+
+Vs
+
+i=0
+while [ $i -lt 5 ]
+do
+        uptime >> LB.log
+        sleep 1
+        ps -f  >> process.log
+        sleep 1
+
+        i=`expr $i + 1`
+done
+
+---------------------------------------------------------------------------
+
+
+while read -p "Enter some text" var
+do
+        echo "$var"
+done> r2.log
+
+---------------------------------------------------------------------------
+
+
+3. read from <ONE file> --- to script--- create a new file and write data to <ANOTHERFILE>
+
+
+read a inputfile from <STDIN>
+- validation : test input file is reg. or not
+
+read a result filename from <STDIN>
+- validation : test result file exist or not --> create a new file
+                                 |
+                                exit
+
+Syntax:-
+
+while read var
+do            -------------> (2)
+	code block -----------> (3)
+done< $inputname      >$resultfile
+     (1)                 (4)
+ 
+
+=============================================================================================================
+
+task 1:
+----
+Write a shell script
+
+Initialize a pin number ex: pin=1234
+
+use while loop - attempt max 3
+     |----> read a input pin from <STDIN>
+     |----> Test input pin matched with existing pin
+			|
+			|---> Pin Matched-Success
+     |----> In all Attempts pin NOT Matched---> Pin is Blocked
+
+
+task 2:
+-------
+|--> create a new file ex: pin_history.log
+          |
+       append user input details (Success; Failed)
+	to pin_history.log
+
+	|- update date/time and pin details to pin_history.log
+
+
+task 3:
+------
+Write a shell script
+
+|---read cmds.txt file - line by line
+     |
+     execute each command
+                   |
+		   append the command result to external log file.
+
+=============================================================================================================================
+
+
+if ![ "`whoami`" == "root" ]
+then
+        echo "Usage: Sorry You are Not root user"
+        exit
+fi
+
+
+while read var
+do
+	rpm -q $var  >> r1.log 2>&1
+
+	if ![ $? -eq 0 ];then
+		echo "Package already exist/ installed"
+		exit
+	else
+		yum -y install at >> /var/log/r2.log 2>&1
+
+		if [ $? -eq 0 ];then
+        		echo "Installation is done."
+	        	
+       		else
+        		echo "Sorry Package installation fails "
+        		echo "refer /var/log/r2.log"
+        		exit
+		fi
+	fi
+
+done<packages.txt
+
+
+============================================================================================================
+
+Two special character type files
+---------------------------------
+
+/dev/zero
+
+/dev/null
+
+
+/dev/zero
+---------
+  |------------to increase storage size
+
+
+dd if=/dev/zero  of=pp.log count=10000 bs=1024
+
+
+pp.log    --> 10000 * 1024 bytes = 10,240,000 bytes = 10MB
+
+
+/dev/null
+---------
+ |--------------> cleanup activity
+
+ping -c 3 google.com > /dev/null
+
+cp /dev/null p1.log     
+
+
+==========================================================================================================================
+
+Commandline arguments
+----------------------
+
+|-----------> runtime argument
+
+
+root@host01~] ./p1.sh <input1> <input2> <input3> …..<inputN> {Enter}
+                       -------------------------------------
+                            | cmdline arg
+
+|-> positional parameter
+
+ 
+root@host01~] ./p1.sh <input1> <input2> <input3> …..<inputN> {Enter}
+                       $1        $2       $3 ………….   ${N} ...
+
+Old Style
+--------
+echo $1 $2 $3 $4 $5 $6 $7 $8 $9
+      |
+shift N
+
+
+
+file: pt.sh
+----------
+
+echo $1 $2 $3 $4 $5
+shift 3
+
+echo $1 $2 $3 $4 $5
+echo $1
+
+./pt.sh  A B C D E F G H I J K 
+
+A B C D E
+D E F G H
+D
+
+echo $*  (or)  $@   - list of all arg
+echo $#      - total no. of arg 
+
+
+current style
+-------------
+
+Nth arg in cmd line --> $N (or) ${N}
+
+echo $1   --->  ${1}
+echo $2   --->  ${2}
+
+…
+echo $9  ---> ${9}
+
+echo ${10}  ${15} 
+       |       |---------15th input 
+       |--- 10th input
+
+echo $* (or) $@ - list of all arg
+echo ${*} (or) ${@} - list of all arg
+
+echo $#      - total no. of arg 
+echo ${#}    - total no of cmd line arg
+
+=============================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
