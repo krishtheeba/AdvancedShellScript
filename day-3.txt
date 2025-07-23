@@ -1,0 +1,976 @@
+Recap
+----
+Day1
+----
+user defined variable -> variable=value
+                         variable=`cmd`  (or) variable=$(command)
+
+shell variable-> export variable=value
+
+
+operators
+--------
+- expr (or) $((expression))
+- test (or) [ ]
+- -a -o !  (or) && ||
+
+conditional statement- if statement
+
+Day2
+----
+- File test operator
+
+- conditional statement- case statement
+
+- Looping statement - while until    for select
+
+- file handling
+
+- commandline argsruntime inputs -> $1 $2 $3... ${n};  $@ $*   ; $#
+
+----------------------------------------------------------------------
+
+commandline arg
+
+ls -l
+|   |---- option
+|
+command
+
+ls -l emp.csv p1.log
+|   | |------------------> arguments
+|   options 
+command
+
+getopts
+--------
+Syntax:-
+getopts optstring Name [ args]
+
+
+optstring - string of chars  -a -b -c
+    
+      -a args
+      -b args
+
+
+ex:- abc   -> -a -b -c  # without argument
+
+a:bc     -> -a -b -c
+            -a <argument>
+
+a:   ->  -a <arg>
+
+a:b:   -> -a<args>  -b<args>
+
+a:b:c   -> -a<arg>
+           -b<arg>
+           -c
+
+Name  # variable - getopts uses store current option from optstring  // for processing
+
+
+
+while loop + case statement
+--------------------------
+
+while getopts <optstring> <optvariable>
+do
+	case $<optvariable> in
+	 		….
+	esac
+done
+-----------------------------------------------------------------
+
+
+mkdir $1
+
+./p1.sh demo  # ok
+
+./p1.sh <empty> // error
+
+vs
+
+while getopts "hd:" opt
+do
+	case $opt in
+	d) mkdir "$OPTARG" ;;
+
+        h) echo "$) -d <directory>";;
+	esac
+done
+
+----------------------------------------------------------------------------------------
+
+Array
+=====
+
+command--> result
+           |--> Single word/digit
+
+
+ex:-
+
+whoami    var=`whoami`
+
+command-> result
+           |--- more than 1 word/digits/multiple lines
+
+ps      var=`ps`   vs  arr=(`ps`)
+
+Array
+|--> variable - hold multiple values  - different type of value
+               - each value - different address
+               - index based
+                  |------ default index starts from 0  1 2 3...N
+                 [index]
+
+
+Syntax:-
+-------
+arrayName=( list of items)
+
+arr=(105 98.3 data T `whoami`) => different type
+      0   1     2  3   4          => positive index
+      -5 -4    -3 -2  -1         => negative index
+
+
+How to fetch single value from array?
+-------------------------------------
+
+${arrayName[index]}
+         
+echo ${arr[1]}   => 98.3 <===  echo ${arr[-4]}
+echo ${arr[0]}   => 104  <===  echo ${arr[-5]}
+
+[ ${arr[0]}   -eq ${arr[-5]} ]; echo $? ;   => 0
+
+
+To list all elements in Array:-
+ $arr[@]}
+
+To delete an element from array:-
+unset arr[index]
+
+To delete all elements
+unset arr[@]
+
+To modify a value
+arr[index]=newvalue
+
+To add a new element
+arr[newindex]=newValue
+
+To get total elements of array
+${#arrayName[@]}
+=============================================================
+
+Task
+====
+|--- Create an empty Array
+|--- Display No. of items from a n array
+
+|--- use while loop - 5 times
+      |--- read a hostname from <STDIN>
+      |--  app input to existing array
+
+|-- use for loop - display items from array
+
+|-- display total no. of items from array
+---------------------------------------------------------------------
+hosts=()                # empty array creation
+
+echo "No. of Items : ${#hosts[@]}"  # ${#arrayName[@]} - to get total count
+
+c=0
+while [ $c -lt 5 ]
+do
+        read -p "Enter a hostname : " h
+        hosts[$c]=$h                       # arrayName[newIndex]=newvalue
+        c=`expr $c + 1`
+done
+
+echo "List of Host details:-"
+
+for var in ${hosts[@]}            # list of all elements in array
+do
+        echo "$var"
+done
+
+
+echo "No. of Items : ${#host[@]}"     # total count of elements in array
+---------------------------------------------------------------------
+
+
+$@ - list of all commandline args
+
+./p1.sh 10 20 30 40 50  runtime inputs
+        ---------------
+           |---$@
+
+
+=======================================================================================================
+
+Single line validation
+--------------------
+[]  &&  []
+    |--- logical and
+
+command1 && command2
+--------
+|
+execute command1-> success--> then execute command2
+
+
+
+command1 && command2
+--------
+|
+execute command1-> fails--> then NOT execute command2
+
+
+
+command1 || command2
+|
+execute command1--> success -> then wont execute command2
+
+
+command1 || command2
+|
+execute command1--> fails -> then execute command2
+---------------------------------------------------------------------------------------------------------
+[root@node2 day3]# echo One && echo Two
+One
+Two
+[root@node2 day3]# cat ll && echo Two
+cat: ll: No such file or directory
+[root@node2 day3]#
+[root@node2 day3]# [-f p1.sh ] && ls -l p1.sh
+-bash: [-f: command not found
+[root@node2 day3]# [ -f p1.sh ] && ls -l p1.sh
+-rwxr-xr-x. 1 root root 117 Jul 23 09:50 p1.sh
+[root@node2 day3]#
+[root@node2 day3]#
+[root@node2 day3]#
+[root@node2 day3]# echo One || echo Two
+One
+[root@node2 day3]# cat ll || echo "sorry ll file not exist"
+cat: ll: No such file or directory
+sorry ll file not exist
+[root@node2 day3]#
+[root@node2 day3]#
+
+-----------------------------------------------------------------------------------------------------
+
+if ! [ -f filename ]
+then
+	exit             =====>   [ -f filename ] || exit
+fi
+
+
+
+if [ -d demo1 ]
+then
+	ls -ld demo1      ===>   [-d demo1 ] && ls -ld demo1
+fi
+
+===============================================================================================================================
+
+Functions
+=========
+
+|--> Code block - collection of commands and scripts
+|--> reused
+
+|-> code definition
+|--> function call - invoking the function defn
+
+definition syntax:-
+------------------
+
+function functionName()
+{
+	codeblock
+}
+
+# function - keyword
+
+functionName  # simple function call
+
+==================================================================================================
+
+Task
+====
+Create a shell script
+
+create function f1() to display list of all files
+
+create 2nd function f2() to display list of all currently executing Processes in system.
+
+create 3rd function f3() to display list of mounted filesystem.
+
+call f1()
+call f2()
+call f3()
+
+
+==========================================================================================================
+
+
+f1 unix Linux mac   # function call with arg
+
+f1 # simple function call
+
+Inside the function defn,
+=====================================
+$1 $2 $3..                            |
+
+$@   - list of all function inputs    |
+  
+$#   - total no. of inputs to function |
+=======================================
+
+
+f1(){
+        echo "List of servers:"
+
+        echo "Server 1=$1 server2=$2"
+
+        echo "Total no. of function inputs : $#"
+
+        for var in $@
+        do
+                echo "$var"
+        done
+}
+
+
+f1 unix linux mac minix qnx    # func call with arg
+
+f1    # simple function callis f3  block
+
+========================================================================
+
+
+
+echo "From Commandline arg:-"
+echo $1 $2 $3
+echo $@
+echo $#
+
+
+sleep 5;
+echo
+
+f1(){
+        echo "This  is $FUNCNAME block"
+        echo "1st arg: $1 2nd arg: $2"
+        echo "Total no. of args: $#"
+        echo "List of all : $@"
+        echo"Exit from $FUNCNAME block"
+}
+
+f2(){
+        echo "This  is $FUNCNAME block"
+        echo "1st arg: $1 2nd arg: $2"
+        echo "Total no. of args: $#"
+        echo "List of all : $@"
+        echo"Exit from $FUNCNAME block"
+}
+
+f1 10 20 30 40 50 60 70 80  # function call with arg
+sleep 2
+f2 X1 X2 X3  # function call with arg
+
+echo "Exit from $0 script"
+========================================================================================
+
+
+Task
+====
+Write a Shell Script
+
+1.Create a function create_directory  (fn defn)
+             |
+	    Inside function------> perform validation for fn arg.
+			   ------> perform validation for directory existence and
+                           ------> use mkdir to create directory
+					|-------------------------------> else  , display" Directory creation Failed"
+					if created, display "Directory created successfully"
+
+
+
+2.Create an array with directory names.
+
+3.Use for loop with array, and iterate on the array content.
+
+Use each element as function input to create_directory() function.
+
+========================================================================================
+
+
+create_directory(){
+        # To create a directory
+
+        if [ $#  -eq 0 ]; then
+
+                echo "Usage: Argument is Missing"
+                echo "$FUNCNAME <directory>"
+                exit
+        fi
+
+        [ -d $1 ] || mkdir $1
+        if [ $? -eq 0 ];then
+                echo "Directory $1 created"
+        else
+                echo "Directory $1 creation Failed"
+        fi
+
+}
+
+#create_directory Demo
+
+Arr=(Demo1 Demo2 Demo3 Demo4)
+for var in ${Arr[@]}
+do
+        create_directory $var
+done
+------------------------------------------------------------
+
+
+[root@node2 day3]# ls
+Demo   Demo2  Demo4   p11.sh  p2.sh  p4.sh  p6.sh  p8.sh  sample
+Demo1  Demo3  p10.sh  p1.sh   p3.sh  p5.sh  p7.sh  p9.sh
+[root@node2 day3]#
+[root@node2 day3]#
+[root@node2 day3]# for var in *
+> do
+> [ -d $var ] && rmdir $var
+> done
+[root@node2 day3]#
+[root@node2 day3]# ls
+p10.sh  p11.sh  p1.sh  p2.sh  p3.sh  p4.sh  p5.sh  p6.sh  p7.sh  p8.sh  p9.sh
+[root@node2 day3]#
+
+
+
+------------------------------------------------------------------------------------------
+[root@node2 day3]# echo $app
+
+[root@node2 day3]# echo $port
+
+[root@node2 day3]# fx
+-bash: fx: command not found
+[root@node2 day3]# source /root/day3/p12.sh
+[root@node2 day3]# echo $app
+webapp
+[root@node2 day3]# echo $port
+1000
+[root@node2 day3]# fx
+Total=250
+[root@node2 day3]# vi p12.sh
+[root@node2 day3]# clear
+[root@node2 day3]#
+[root@node2 day3]# source /root/day3/p12.sh
+1233
+[root@node2 day3]# ps
+    PID TTY          TIME CMD
+   1233 pts/0    00:00:00 bash
+   1639 pts/0    00:00:00 bash
+   1642 pts/0    00:00:00 sleep
+   1734 pts/0    00:00:00 ps
+[root@node2 day3]# echo $port
+1000
+[root@node2 day3]# echo $app
+webapp
+[root@node2 day3]# fx
+Total=250
+[root@node2 day3]# . ./p12.sh
+1233
+[root@node2 day3]#
+
+=================================================================================================
+
+
+
+f1(){
+  ….
+ return <number>
+}
+
+f1
+$?===> hold number
+
+
+test(){
+	if [ $1 % 2 == 0 ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+test 4
+
+if [ $? -eq 0 ]; then
+	echo "even number"
+else
+	echo "odd"
+fi
+
+==============
+
+get_name(){
+	local name="Sam"
+	echo $name
+}
+
+my_name=$(get_name)
+echo "Name is : " $my_name
+
+=================================================================================
+export variable=value
+export -f functionname
+-----------------------------------------------------------------------------------
+
+
+-bash
+[root@node2 day3]# var=100
+[root@node2 day3]# echo $var
+100
+[root@node2 day3]# sh
+sh-4.4#
+sh-4.4# echo $0
+sh
+sh-4.4# echo $var
+
+sh-4.4# exit
+exit
+[root@node2 day3]# export var=100
+[root@node2 day3]#
+[root@node2 day3]# echo $0
+-bash
+[root@node2 day3]# echo $var
+100
+[root@node2 day3]# sh
+sh-4.4# echo $0
+sh
+sh-4.4# echo $var
+100
+sh-4.4# exit
+exit
+[root@node2 day3]# clear
+[root@node2 day3]# fx(){
+> echo "This is FX code"
+> }
+[root@node2 day3]#
+[root@node2 day3]# fx
+This is FX code
+[root@node2 day3]#
+[root@node2 day3]# echo $0
+-bash
+[root@node2 day3]# sh
+sh-4.4#
+sh-4.4# echo $0
+sh
+sh-4.4# fx
+sh: fx: command not found
+sh-4.4# exit
+exit
+[root@node2 day3]# fx
+This is FX code
+[root@node2 day3]# export -f fx
+[root@node2 day3]# sh
+sh-4.4# echo $0
+sh
+sh-4.4# fx
+This is FX code
+sh-4.4# exit
+exit
+[root@node2 day3]# fx
+This is FX code
+[root@node2 day3]# unset -f fx
+[root@node2 day3]# fx
+-bash: fx: command not found
+[root@node2 day3]#
+
+===========================================================================================
+
+Login:_________
+
+password:_________
+
+    |
+shell(CLI)     vs   Desktop(GUI)
+
+Login : root       Login: userA
+password :         password:
+
+
+/etc/profile
+-------------
+|---- Global Configuration script file
+|---- edit by root user
+
+
+root@host~] pwd                userA@host~]$pwd
+
+/root                         /home/userA
+
+
+
+root@host~]ls -a 		userA@host~]ls -a 
+.bashrc					.bashrc
+.bash_history                            .bash_history
+
+=============================================================================================================================
+
+Task
+====
+1)
+Given Array
+Disk_Size=(120 100 150 200 250)
+
+Calculate the Sum of disk size
+Display total value to monitor
+
+2)
+Write a Shell Script 
+
+	use filter command - filter list of all .sh files from /etc directory (or) login directory ~
+	
+	|
+	Initialize find command result to an array
+	|
+	Count - display total no of .sh files
+	|
+	Test - no. of .sh file less than 10 -  for loop - iterate one by one
+
+
+
+-------------------------------------------------------------------------------------------
+
+[root@node2 day3]# cat p17.sh
+
+
+con_sh=(`find /etc -name "*.sh"`)
+
+echo "Total no. of sh files : ${#con_sh[@]}"
+
+
+if [ ${#con_sh[@]} -lt 10 ];then
+        for var in ${con_sh[@]}
+        do
+                echo $var
+        done
+else
+        echo "No. of files more than 10"
+fi
+[root@node2 day3]# cat p16.sh
+
+Disk_size=(120 100 150 200 250)
+
+total=0
+for var in ${Disk_size[@]}
+do
+        total=`expr $total + $var`
+done
+
+
+-----------------------------------------------------
+
+Regular Expression
+------------------
+
+- search     -----> grep sed awk  // commands
+
+- substitute   ---> sed
+
+
+
+1. Basic Regular Expression     (BRE)
+
+2. Extended Regular Expression  (ERE)
+
+1. Basic Regular Expression     (BRE)
+---------------------------------------
+
+- Single pattern
+
+
+^
+$
+^pattern$
+.
+.*
+[]
+^[]
+
+[]$
+[^]
+^$
+=========================================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
