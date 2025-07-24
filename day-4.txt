@@ -1,0 +1,1326 @@
+.bashrc     -> Non login interactive shell
+
+.bashrc -> changes is permanent
+
+/etc/profile
+
+
+|
+login
+passwd:
+|
+/etc/profile  - Global configuration file
+|
+parameters initialized
+
+||
+vi .bashrc
+|
+changes
+|
+override parameters in /etc/profile
+
+
+
+.bashrc                    .bash_profile
+
+Non-login Interactive      Login shell
+
+
+
+vi .bash_profile
+
+|
+|
+source .bashrc
+====================================================================================
+
+root@host~] vi /etc/profile
+
+export app="Flask"
+export port=1000
+:wq
+
+
+root@host~] reboot (or) open a subshell (or) source /etc/profile
+
+root@host~] env| grep -E "app|port"
+app=flask
+port=1000
+----------------
+login:shan
+
+shan@host~]  env| grep -E "app|port"
+app=flask
+port=1000
+
+shan@host~] vi .bashrc
+
+export app=demoApp
+:wq
+shan@host~] reboot (or) open a subshell (or) source .bashrc
+shan@host~]  env| grep -E "app|port"
+app=demoApp
+port=1000
+
+shan@host~] source /etc/profile
+shan@host~] env| grep -E "app|port"
+app=flask
+port=1000
+
+---------------------------------------------------------------------------------------
+
+Regular Expression
+------------------
+
+|-> search   -> grep sed awk // commands
+
+|-> substitute -> sed command
+
+
+1. BRE
+----
+^
+$
+^pattern$
+.
+.*
+[]
+^[]
+[]$
+[^]
+^$  empty
+
+grep options pattern Inputfile
+
+^pattern - matches pattern line starts
+
+pattern$ - matches pattern at line end
+
+^pattern$ - pattern only style
+
+. (dot) - match any single character except \n
+
+[] => character class
+
+[Aa]run
+-------------> Arun arun  // ok
+
+[Aa][Rr]un 
+-------------> Arun arun ARun aRun // ok
+
+[a-z]
+[A-Z]
+[a-zA-Z]
+[0-9]
+[a-zA-Z0-9]  // alpha numeric
+
+
+
+.* -> 0 or more character 
+
+^[a-z]    line starts with lowercase
+
+[a-z]$    line ends with lowercase
+
+[^a-z]   Not match lowercase characters
+
+
+[^a-zA-Z]  -> Not matches alphabets
+
+[^a-zA-Z0-9] --> match special characters
+
+
+
+character class			Posix class
+
+[a-z]				 [[:lower:]]
+
+[A-Z]				[[:upper:]]
+
+[a-zA-Z]			[[:alpha:]]
+
+[0-9]				[[:digit:]]
+
+[a-zA-Z0-9]			[[:alnum:]]
+
+space " "			[[:space:]]
+
+
+[^a-zA-Z0-9' ']			[[:punct:]]
+
+^$ -> empty line
+----------------------------
+[root@node2 day4]# cat IP
+sales,bengaluru
+sales
+sales,
+sales:
+sales
+raj,sales,9000,sales list records about sales
+data,sales,temp,sales,sales
+SALES,pop,list of sales
+sales details sales
+[root@node2 day4]#
+[root@node2 day4]# grep ^sales IP
+sales,bengaluru
+sales
+sales,
+sales:
+sales
+sales details sales
+[root@node2 day4]# cat -n IP
+     1  sales,bengaluru
+     2  sales
+     3  sales,
+     4  sales:
+     5  sales
+     6  raj,sales,9000,sales list records about           sales
+     7  data,sales,temp,sales,sales
+     8  SALES,pop,list of sales
+     9  sales details sales
+[root@node2 day4]# grep -n ^sales IP
+1:sales,bengaluru
+2:sales
+3:sales,
+4:sales:
+5:sales
+9:sales details sales
+[root@node2 day4]# grep -n ^s IP
+1:sales,bengaluru
+2:sales
+3:sales,
+4:sales:
+5:sales
+9:sales details sales
+[root@node2 day4]# ls -l ~| grep "^d"
+drwxr-xr-x. 2 root root   183 Jul 21 18:18 day1
+drwxr-xr-x. 2 root root  4096 Jul 22 17:15 day2
+drwxr-xr-x. 2 root root  4096 Jul 23 17:01 day3
+drwxr-xr-x. 2 root root    46 Jul 24 01:47 day4
+drwxr-xr-x. 2 root root    19 Jul 23 13:59 scrip          ts
+drwxr-xr-x. 3 root root    20 Jul 20 12:45 Scrip          ts
+[root@node2 day4]# ps| grep ^" "
+    PID TTY          TIME CMD
+   2310 pts/1    00:00:00 bash
+   2406 pts/1    00:00:00 ps
+   2407 pts/1    00:00:00 grep
+[root@node2 day4]# grep ^sales$ IP
+sales
+sales
+[root@node2 day4]# grep -n ^sales$ IP
+2:sales
+5:sales
+[root@node2 day4]# grep -n ^sales IP
+1:sales,bengaluru
+2:sales
+3:sales,
+4:sales:
+5:sales
+9:sales details sales
+[root@node2 day4]# grep -n sales$ IP
+2:sales
+5:sales
+6:raj,sales,9000,sales list records about sales
+7:data,sales,temp,sales,sales
+8:SALES,pop,list of sales
+9:sales details sales
+[root@node2 day4]# grep -n sales. IP
+1:sales,bengaluru
+3:sales,
+4:sales:
+6:raj,sales,9000,sales list records about sales
+7:data,sales,temp,sales,sales
+9:sales details sales
+[root@node2 day4]# grep -n sales.. IP
+1:sales,bengaluru
+6:raj,sales,9000,sales list records about sales
+7:data,sales,temp,sales,sales
+9:sales details sales
+[root@node2 day4]# ps |grep ..$
+    PID TTY          TIME CMD
+   2310 pts/1    00:00:00 bash
+   2415 pts/1    00:00:00 ps
+   2416 pts/1    00:00:00 grep
+[root@node2 day4]# grep "^[a-zA-Z].*[a-zA-Z0-9]$" IP      sales,bengaluru
+sales
+sales
+raj,sales,9000,sales list records about sales
+data,sales,temp,sales,sales
+SALES,pop,list of sales
+sales details sales
+[root@node2 day4]# grep "^[a-z].*[a-zA-Z0-9]$" IP
+sales,bengaluru
+sales
+sales
+raj,sales,9000,sales list records about sales
+data,sales,temp,sales,sales
+sales details sales
+[root@node2 day4]# grep -n "^[a-z].*[a-zA-Z0-9]$" IP
+1:sales,bengaluru
+2:sales
+5:sales
+6:raj,sales,9000,sales list records about sales
+7:data,sales,temp,sales,sales
+9:sales details sales
+[root@node2 day4]# cat -n IP
+     1  sales,bengaluru
+     2  sales
+     3  sales,
+     4  sales:
+     5  sales
+     6  raj,sales,9000,sales list records about sales
+     7  data,sales,temp,sales,sales
+     8  SALES,pop,list of sales
+     9  sales details sales
+[root@node2 day4]# grep -n "[^a-z].*[a-zA-Z0-9]$" IP
+1:sales,bengaluru
+6:raj,sales,9000,sales list records about sales
+7:data,sales,temp,sales,sales
+8:SALES,pop,list of sales
+9:sales details sales
+[root@node2 day4]# grep -n "^[^a-z].*[a-zA-Z0-9]$" IP
+8:SALES,pop,list of sales
+[root@node2 day4]#
+[root@node2 day4]# grep "^[a-z].*[[:alnum:]]$" IP
+sales,bengaluru
+sales
+sales
+raj,sales,9000,sales list records about sales
+data,sales,temp,sales,sales
+sales details sales
+[root@node2 day4]# grep "^[a-z].*[a-zA-Z0-9]$" IP
+sales,bengaluru
+sales
+sales
+raj,sales,9000,sales list records about sales
+data,sales,temp,sales,sales
+sales details sales
+[root@node2 day4]# ps
+    PID TTY          TIME CMD
+   2310 pts/1    00:00:00 bash
+   2427 pts/1    00:00:00 ps
+[root@node2 day4]# ps| grep "[[:punct:]]"
+   2310 pts/1    00:00:00 bash
+   2429 pts/1    00:00:00 ps
+   2430 pts/1    00:00:00 grep
+[root@node2 day4]# ps| grep "^[[:space:]]"
+    PID TTY          TIME CMD
+   2310 pts/1    00:00:00 bash
+   2431 pts/1    00:00:00 ps
+   2432 pts/1    00:00:00 grep
+[root@node2 day4]# ps| grep "^' '"
+[root@node2 day4]# ps| grep ^" "
+    PID TTY          TIME CMD
+   2310 pts/1    00:00:00 bash
+   2435 pts/1    00:00:00 ps
+   2436 pts/1    00:00:00 grep
+[root@node2 day4]# ps
+    PID TTY          TIME CMD
+   2310 pts/1    00:00:00 bash
+   2437 pts/1    00:00:00 ps
+[root@node2 day4]# ps >> process.log
+[root@node2 day4]# cat process.log
+    PID TTY          TIME CMD
+   2310 pts/1    00:00:00 bash
+   2438 pts/1    00:00:00 ps
+
+
+[root@node2 day4]# grep -vn "^$" process.log
+1:    PID TTY          TIME CMD
+2:   310 pts/1    00:00:00 bash
+8:    2438 pts/1    00:00:00 ps
+[root@node2 day4]# grep -n "^$" process.log
+3:
+4:
+5:
+6:
+7:
+[root@node2 day4]# grep -nv "^$" process.log
+1:    PID TTY          TIME CMD
+2:   310 pts/1    00:00:00 bash
+8:    2438 pts/1    00:00:00 ps
+[root@node2 day4]#
+=========================================
+ERE  ; grep -E
+
+| () + {}
+
+pattern1 | pattern2 | pattern 3|.... |pattern N|
+-----------------------------------------------
+
+|-> any one pattern match--> True
+
+
+Task
+====
+
+Write a shell script
+
+read any single number (or) two number from commandline argument
+          ------------------------
+                  |--> valid ;      Invalid
+
+./p1.sh 5  -> valid
+./p1.sh 3 4 -> valid
+./p1.sh 2 3 4-> Invalid 
+./p1.sh D1 D2  -> Invalid
+--------------------------------------------
+
+<pattern1> | <pattern2>  - any one pattern is match-> ok
+                            (any order)
+------------> logical or ||
+
+(<patern1>)(<pattern2>) - both pattern match in same order
+
+-----------> logical and && 
+
+
+---------------------------------------------------
+
+[root@node2 day4]# echo "shell supports for and while loop statements"
+shell supports for and while loop statements
+[root@node2 day4]#
+[root@node2 day4]# echo "shell supports for and while loop statements" | grep -E "until|for|select"
+shell supports for and while loop statements
+[root@node2 day4]#
+[root@node2 day4]# echo "shell supports for and while loop statements" | grep -E "until|while|for|select"
+shell supports for and while loop statements
+[root@node2 day4]# echo "shell supports for and while loop statements" | grep -E "(until)(for)(select)"
+[root@node2 day4]# echo "shell supports for and while loop statements" | grep -E "(for)(while)"    [root@node2 day4]# echo "shell supports for and while loop statements" | grep -E "(for).*(while)"
+shell supports for and while loop statements
+[root@node2 day4]# echo "shell supports for and while loop statements" | grep -E "(while).*(for)"
+[root@node2 day4]#
+[root@node2 day4]# echo "shell supports forwhile loop statements" | grep -E "(while)(for)"
+[root@node2 day4]# echo "shell supports whilefor loop statements" | grep -E "(while)(for)"
+shell supports whilefor loop statements
+[root@node2 day4]# echo "shell supports forwhilefor loop statements" | grep -E "(while)(for)"
+shell supports forwhilefor loop statements
+
+
+=======================================================================
+
+
++ => 1 or more
+
+<Pattern>+
+---------
+|----min 1 time ; more time
+
+ab+c
+----
+|----abc
+|----abbc
+|----abbbbbbc 
+------//ok
+
+^[[:space:]]+
+-------------
+|--------------line starts with 1 or more space
+
+^[a-zA-Z][0-9]+  
+-------------
+|-------------  starts with alphabet followed by 1 or more digits
+
+a3
+A2
+a587578
+A687669
+ // ok
+
+---------------------------------------------
+
+{} 
+<pattern>{n}  => ab{3}c   ==> abbbc //ok 
+			abc  abbc abbbbc -> Not ok
+
+<pattern>{n,} => min n times        max --->more times
+
+ab+c   is same as ab{1,}
+
+<pattern>{n,m}   => ab{3,5}c   => abbbc abbbbc abbbbbc // ok
+                                 abc abbc abbbbbbbbbbbc // not ok
+---------------------------------------------------------------------------------
+
+task
+===
+filter list of python,ruby,java rpm packages with any architecture.
+Initialize to user defined array
+
+python_ruby_java=(`rpm -qa| grep -E "^(python|ruby|java).*noarch$"`)
+
+-----------------------------------------------------------------------------
+task
+-----
+
+read a url from <STDIN>
+	|
+	url name starts with http <or> https followed by text
+	end with <org> or <com>					
+       ------------------------------------------------------
+           valid url     ; Invalid url	
+
+"^(http|htpps).*(org|com)$"
+
+http://www.abc.com
+https://www.abc.org
+http://www.abc.org
+https://www.abc.com
+
+----------------//valid
+
+http://www.abc.in
+https://www.abc.edu
+ftp://ww.abc.org
+ftp://ww.abc.com
+------------------// Not matched
+=============================================================================================
+
+=~   match operator
+syntax:-
+-------
+
+[[ $input =~ Pattern ]] -> 0/nonzero
+
+==============================================================
+Task
+====
+
+emp.csv
+======
+101,Arun,sales,pune,23321
+102,jeeva,prod,bengaluru,3222
+103,Arun,crm,pune,23321
+104,jeeva,hr,bengaluru,3222
+
+Write a Shell Script
+
+read the file emp.csv
+Using match operator, search for sales dept employee and display the emp details.
+
+------------------------
+while read var
+do
+	if [[ $var =~ sales ]]; then
+		echo $var
+	fi
+done<emp.csv
+
+=========================================================================================
+
+sed  - stream editor
+----
+
+
+grep
+===
+grep -option pattern inputfile
+
+pattern: string (or) Text
+action: search -> print
+
+sed
+===
+sed -option 'patternAction'inputfile
+
+pattern:
+     1. Line number  (or) Address
+     2. string (or) Text
+
+Action: search -> print(p) ; write(w); delete(d) ; insert(i); append(a); change (c);
+        substitute (s)
+
+
+sed internal operation
+-----------------------
+1. READ  - read input data from file -- line by line
+2. STORES - stores to internal buffer -- pattern buffer
+3. ACTION - execute sed operation / command on the buffer  # no change in file content
+|
+4. DISPLAY - display execution result to the Monitor - buffer will be empty
+
+Pattern
+-------
+1. Line Based pattern Search
+============================
+
+syntax:-
+
+sed -option 'NAction' inputfile
+
+N- line number
+
+
+print 3 rd line ->   sed -option '3p' inputfile
+
+print from 3rd line to 5th line
+
+N---> Nth line
+N,M -> from Nth line to Mth line   ==> sed -option '3,5p' inputfile
+                                         print from 3rd line to 5th line
+
+-e N  -e M ==> sed -option -e '3p' -e '5p' inputfile
+                      prints 3rd line and 5th line - not range
+
+N
+N,M
+-e N -e M
+
+print(p) and write(w) => -n option is required.
+
+
+IP
+---
+data1
+data2
+data3
+----
+
+print 2nd line
+
+sed '2p' IP
+
+IP			Buffer			Monitor
+---			------			-------
+data1			data1
+data2			data2   --------->        data2
+data3			data3
+-----			------
+|---------------------print(p)-------------->      data1
+						   data2
+						   data3
+
+
+=================================================================
+
+print(p)
+
+sed -n '3p' emp.csv
+
+sed -n '3,5' emp.csv
+
+sed -n -e '3p' -e '5p' emp.csv
+
+sed -n -e '1p' -e '$p' emp.csv
+
+command| sed -option 'patternAction'
+
+==========================================================================
+[root@node2 day4]# cat -n emp.csv
+     1  101,raj,sales,pune,1000
+     2  102,leo,prod,bglore,2301
+     3  230,raj,prod,pune,2300
+     4  450,shan,sales,bglore,3401
+     5  542,anu,HR,mumbai,4590
+     6  321,bibu,sales,hyd,5419
+     7  651,ram,hr,bglore,3130
+     8  541,leo,admin,chennai,4913
+[root@node2 day4]# sed '3p' emp.csv
+101,raj,sales,pune,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+651,ram,hr,bglore,3130
+541,leo,admin,chennai,4913
+[root@node2 day4]# cat -n emp.csv|sed '3p'
+     1  101,raj,sales,pune,1000
+     2  102,leo,prod,bglore,2301
+     3  230,raj,prod,pune,2300
+     3  230,raj,prod,pune,2300
+     4  450,shan,sales,bglore,3401
+     5  542,anu,HR,mumbai,4590
+     6  321,bibu,sales,hyd,5419
+     7  651,ram,hr,bglore,3130
+     8  541,leo,admin,chennai,4913
+[root@node2 day4]# cat -n emp.csv|sed -n '3p'
+     3  230,raj,prod,pune,2300
+[root@node2 day4]# cat -n emp.csv|sed -n '3,5p'
+     3  230,raj,prod,pune,2300
+     4  450,shan,sales,bglore,3401
+     5  542,anu,HR,mumbai,4590
+[root@node2 day4]# cat -n emp.csv|sed -n -e '3p' -e '5p'
+     3  230,raj,prod,pune,2300
+     5  542,anu,HR,mumbai,4590
+[root@node2 day4]# cat -n emp.csv|sed -n -e '3p' -e '5p' -e '8p'
+     3  230,raj,prod,pune,2300
+     5  542,anu,HR,mumbai,4590
+     8  541,leo,admin,chennai,4913
+[root@node2 day4]# cat -n emp.csv|sed -n -e '3p' -e '5p' -e '$p'
+     3  230,raj,prod,pune,2300
+     5  542,anu,HR,mumbai,4590
+     8  541,leo,admin,chennai,4913
+[root@node2 day4]# ps -e| sed -n -e '1p' -e '$p'
+    PID TTY          TIME CMD
+   2813 pts/1    00:00:00 sed
+[root@node2 day4]# ps -e| sed -n '1,3p'
+    PID TTY          TIME CMD
+      1 ?        00:00:01 systemd
+      2 ?        00:00:00 kthreadd
+[root@node2 day4]# ps -e| sed -n '3p'
+      2 ?        00:00:00 kthreadd
+[root@node2 day4]#
+
+===============================================================================================
+
+write (w)
+========
+
+sed -n '3p' emp.csv > r1.log  - General 
+
+sed -n 'Nw<space>Resultfile'  inputfile
+         |          |
+        write      must be a newfile
+
+--------------------------------------------
+
+sed -n '3w r1.log' emp.csv  
+-----------------------------------------
+sed -n '3,5w r2.log' emp.csv
+-----------------------------------------
+sed -n -e '3w r3.log' -e '5w r3.log' emp.csv
+--------------------------------------------
+sed -n -e '3w three.log' -e '5w four.log' emp.csv
+-----------------------------------------------------
+
+
+[root@node2 day4]# sed -n '3w r1.log' emp.csv
+[root@node2 day4]# cat r1.log
+230,raj,prod,pune,2300
+[root@node2 day4]# cat -n emp.csv |sed -n '3w r1.log'
+[root@node2 day4]# cat r1.log
+     3  230,raj,prod,pune,2300
+[root@node2 day4]# cat -n emp.csv |sed -n '3,5w r2.log'
+[root@node2 day4]# cat r2.log
+     3  230,raj,prod,pune,2300
+     4  450,shan,sales,bglore,3401
+     5  542,anu,HR,mumbai,4590
+[root@node2 day4]# sed -n -e '3w r1.log' -e '5w r1.log'  emp.csv
+[root@node2 day4]# cat r1.log
+230,raj,prod,pune,2300
+542,anu,HR,mumbai,4590
+[root@node2 day4]# cat -n emp.csv|sed -n -e '3w r1.log' -e '5w r1.log'
+[root@node2 day4]# cat r1.log
+     3  230,raj,prod,pune,2300
+     5  542,anu,HR,mumbai,4590
+[root@node2 day4]# cat -n emp.csv|sed -n -e '3w three.log' -e '5w five.log'
+[root@node2 day4]# cat three.log
+     3  230,raj,prod,pune,2300
+[root@node2 day4]# cat five.log
+     5  542,anu,HR,mumbai,4590
+[root@node2 day4]# cat -n emp.csv |sed '3w r1.log'
+     1  101,raj,sales,pune,1000
+     2  102,leo,prod,bglore,2301
+     3  230,raj,prod,pune,2300
+     4  450,shan,sales,bglore,3401
+     5  542,anu,HR,mumbai,4590
+     6  321,bibu,sales,hyd,5419
+     7  651,ram,hr,bglore,3130
+     8  541,leo,admin,chennai,4913
+[root@node2 day4]# cat r1.log
+     3  230,raj,prod,pune,2300
+[root@node2 day4]# cat -n emp.csv |sed -n '3w r1.log'
+[root@node2 day4]# cat r1.log
+     3  230,raj,prod,pune,2300
+
+----------------------------------------------------------------------------------------
+
+delete(d)
+
+opp. print
+
+print => 2nd line print ==> sed -n '2p' IP
+delete => 2nd line delete => sed '2d' IP
+
+
+IP		Buffer	       		 Monitor
+--		-----			-------
+data1		data1			data1
+data2		
+data3		data3			data3
+
+
+-------------------------------------------------------------------------
+[root@node2 day4]# cat -n emp.csv| sed '3d'
+     1  101,raj,sales,pune,1000
+     2  102,leo,prod,bglore,2301
+     4  450,shan,sales,bglore,3401
+     5  542,anu,HR,mumbai,4590
+     6  321,bibu,sales,hyd,5419
+     7  651,ram,hr,bglore,3130
+     8  541,leo,admin,chennai,4913
+[root@node2 day4]#
+[root@node2 day4]# cat -n emp.csv| sed '3,5d'
+     1  101,raj,sales,pune,1000
+     2  102,leo,prod,bglore,2301
+     6  321,bibu,sales,hyd,5419
+     7  651,ram,hr,bglore,3130
+     8  541,leo,admin,chennai,4913
+[root@node2 day4]# cat -n emp.csv| sed -e '3d' -e '5d'
+     1  101,raj,sales,pune,1000
+     2  102,leo,prod,bglore,2301
+     4  450,shan,sales,bglore,3401
+     6  321,bibu,sales,hyd,5419
+     7  651,ram,hr,bglore,3130
+     8  541,leo,admin,chennai,4913
+[root@node2 day4]# ls
+cmdlist  emp.csv  -eq  five.log  IP  p1.sh  p2.sh  process.log  r1.log  r2.log  three.log
+[root@node2 day4]# cat > IP2.log
+----------------Header--------------
+data1
+data2
+data3
+----------------Footer--------------
+[root@node2 day4]#
+[root@node2 day4]# cat IP2.log
+----------------Header--------------
+data1
+data2
+data3
+----------------Footer--------------
+[root@node2 day4]# sed -e '1d' -e '$d' IP2.log
+data1
+data2
+data3
+[root@node2 day4]# ps
+    PID TTY          TIME CMD
+   2310 pts/1    00:00:00 bash
+   2889 pts/1    00:00:00 ps
+[root@node2 day4]# ps | sed '1d'
+   2310 pts/1    00:00:00 bash
+   2890 pts/1    00:00:00 ps
+   2891 pts/1    00:00:00 sed
+[root@node2 day4]# free -m
+              total        used        free      shared  buff/cache   available
+Mem:           3729         270        2638           8         820        3225
+Swap:          4767           0        4767
+[root@node2 day4]# free -m|sed '1d'
+Mem:           3729         270        2638           8         820        3225
+Swap:          4767           0        4767
+[root@node2 day4]# ps | sed -e '1d' -e '$d'
+   2310 pts/1    00:00:00 bash
+   2895 pts/1    00:00:00 ps
+
+-----------------------------------------------------------------------------------
+
+
+insert(i)      vs      append(a)  - adding new data to existingfile
+
+sed 'Patterni<newText>' IP  VS  sed 'Patterna<newText> IP
+
+
+IP
+---
+data1
+data2
+data3
+----
+sed '2i XYZ' IP        vs    sed '2a XYZ' IP
+
+data1				data1
+XYZ				data2
+data2				XYX
+data3				data3
+===================================================================
+
+
+[root@node2 day4]# ps
+    PID TTY          TIME CMD
+   2310 pts/1    00:00:00 bash
+   2899 pts/1    00:00:00 ps
+[root@node2 day4]# ps|sed '1i ----------'
+----------
+    PID TTY          TIME CMD
+   2310 pts/1    00:00:00 bash
+   2900 pts/1    00:00:00 ps
+   2901 pts/1    00:00:00 sed
+[root@node2 day4]# ps|sed -e '1i ----------' -e '1a ------------'
+----------
+    PID TTY          TIME CMD
+------------
+   2310 pts/1    00:00:00 bash
+   2902 pts/1    00:00:00 ps
+   2903 pts/1    00:00:00 sed
+[root@node2 day4]# ps|sed -e '1i ----------' -e '1a ------------' -e '$a -------------'
+----------
+    PID TTY          TIME CMD
+------------
+   2310 pts/1    00:00:00 bash
+   2905 pts/1    00:00:00 ps
+   2906 pts/1    00:00:00 sed
+-------------
+
+-------------------------------------------------------------------------------------------
+
+change(c)
+---------
+sed 'Nc <replace>' inputfile
+
+IP
+---
+data1
+data2
+data3
+---
+sed '2i XYZ' IP        vs    sed '2a XYZ' IP       vs      sed '2c XYZ' IP
+
+data1				data1			   data1
+XYZ				data2                      XYZ
+data2				XYX                        data3
+data3				data3
+--------------------------------------------------------------------------------------------
+[root@node2 day4]# sed '5i 111,paul,sales,pune,23232' emp.csv
+101,raj,sales,pune,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+111,paul,sales,pune,23232
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+651,ram,hr,bglore,3130
+541,leo,admin,chennai,4913
+[root@node2 day4]# sed '5a 111,paul,sales,pune,23232' emp.csv
+101,raj,sales,pune,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+111,paul,sales,pune,23232
+321,bibu,sales,hyd,5419
+651,ram,hr,bglore,3130
+541,leo,admin,chennai,4913
+[root@node2 day4]# sed '5c 111,paul,sales,pune,23232' emp.csv
+101,raj,sales,pune,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+111,paul,sales,pune,23232
+321,bibu,sales,hyd,5419
+651,ram,hr,bglore,3130
+541,leo,admin,chennai,4913
+[root@node2 day4]# sed '$i 111,paul,sales,pune,23232' emp.csv
+101,raj,sales,pune,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+651,ram,hr,bglore,3130
+111,paul,sales,pune,23232
+541,leo,admin,chennai,4913
+[root@node2 day4]# sed '$a 111,paul,sales,pune,23232' emp.csv
+101,raj,sales,pune,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+651,ram,hr,bglore,3130
+541,leo,admin,chennai,4913
+111,paul,sales,pune,23232
+[root@node2 day4]# sed '$c 111,paul,sales,pune,23232' emp.csv
+101,raj,sales,pune,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+651,ram,hr,bglore,3130
+111,paul,sales,pune,23232
+[root@node2 day4]# sed '$a 111,paul,sales,pune,23232' emp.csv
+
+----------------------------------------------------------------------------------------
+execute (e)  - execute shell commands
+--------------
+cmdlist
+------------
+date
+ls
+uname
+ps
+-------------
+
+sed 'e' IP
+
+---------------
+
+# cat cmdlist
+date
+uname -rs
+ps -f
+[root@node2 day4]#
+[root@node2 day4]# sed 'e' cmdlist
+Thu Jul 24 08:07:33 IST 2025
+Linux 5.15.0-309.180.4.2.el8uek.x86_64
+UID          PID    PPID  C STIME TTY          TIME CMD
+root        2310    2309  0 02:00 pts/1    00:00:00 -bash
+root        2993    2310  0 08:07 pts/1    00:00:00 sed e cmdlist
+root        2996    2993  0 08:07 pts/1    00:00:00 ps -f
+[root@node2 day4]#
+[root@node2 day4]# sed -e 'e' cmdlist -ne 'w r.log'
+[root@node2 day4]# ls
+cmdlist  -eq       IP       p1.sh  process.log  r2.log  three.log
+emp.csv  five.log  IP2.log  p2.sh  r1.log       r.log
+[root@node2 day4]# cat r.log
+Thu Jul 24 08:09:01 IST 2025
+Linux 5.15.0-309.180.4.2.el8uek.x86_64
+UID          PID    PPID  C STIME TTY          TIME CMD
+root        2310    2309  0 02:00 pts/1    00:00:00 -bash
+root        2998    2310  0 08:09 pts/1    00:00:00 sed -e e cmdlist -ne w r.log
+root        3001    2998 99 08:09 pts/1    00:00:00 ps -f
+[root@node2 day4]# sed -e 'e' cmdlist -n -e 'w r.log'
+[root@node2 day4]# cat r.log
+Thu Jul 24 08:09:42 IST 2025
+Linux 5.15.0-309.180.4.2.el8uek.x86_64
+UID          PID    PPID  C STIME TTY          TIME CMD
+root        2310    2309  0 02:00 pts/1    00:00:00 -bash
+root        3004    2310  0 08:09 pts/1    00:00:00 sed -e e cmdlist -n -e w r.log
+root        3007    3004  0 08:09 pts/1    00:00:00 ps -f
+[root@node2 day4]# sed -e 'e' cmdlist -e -n 'w r.log'
+sed: -e expression #2, char 1: unknown command: `-'
+[root@node2 day4]# sed -e 'e' cmdlist -e -n 'w r.log'
+sed: -e expression #2, char 1: unknown command: `-'
+[root@node2 day4]# sed -e 'e' cmdlist -n -e 'w r.log'
+[root@node2 day4]# cat r.log
+Thu Jul 24 08:10:41 IST 2025
+Linux 5.15.0-309.180.4.2.el8uek.x86_64
+UID          PID    PPID  C STIME TTY          TIME CMD
+root        2310    2309  0 02:00 pts/1    00:00:00 -bash
+root        3011    2310  0 08:10 pts/1    00:00:00 sed -e e cmdlist -n -e w r.log
+root        3014    3011 99 08:10 pts/1    00:00:00 ps -f
+[root@node2 day4]# sed -e 'e' cmdlist -ne 'w r.log'
+[root@node2 day4]# cat r.log
+Thu Jul 24 08:10:57 IST 2025
+Linux 5.15.0-309.180.4.2.el8uek.x86_64
+UID          PID    PPID  C STIME TTY          TIME CMD
+root        2310    2309  0 02:00 pts/1    00:00:00 -bash
+root        3016    2310  0 08:10 pts/1    00:00:00 sed -e e cmdlist -ne w r.log
+root        3019    3016  0 08:10 pts/1    00:00:00 ps -f
+[root@node2 day4]#
+
+----------------------------------------
+
+2. String or Text
+------------------
+sed -option 'NAction' inputfile
+
+sed -option '/pattern/Action' inputfile
+             ---------
+              |
+             Regx
+
+N--> /string/
+           
+  
+print(p)----> 3rd line => sed -n '3p' emp.csv
+
+print(p) ---> sales data => sed -n '/sales/p'  emp.csv
+ ===========================================================================
+
+grep sales emp.csv       ---- same as -------- sed -n '/sales/p' emp.csv
+|
+default action-> print
+============================================================================
+
+grep -E "^[0-9].*(sales|prod).*00$" emp.csv
+|
+|
+sed -nr '/^[0-9].*(sales|prod).*00$/p' emp.csv
+
+-n option is print(p), write(w)
+-r option is ERE
+
+--------------------------------------------------------------------
+
+print 3rd line ==> sed -n '3p' emp.csv
+|
+print sales line => sed -n'/sales/p' emp.csv
+
+write(w) 
+write 3rd line => sed -n '3w r1.log' emp.csv
+write sales =>  sed -n '/sales/w r1.log' emp.csv
+
+grep -e sales -e prod emp.csv
+sed -n -e '/sales/p' -e '/prod/p' -e '/pune/'p emp.csv
+
+
+------------------------------------------------------------------
+
+substitute
+-----------
+sed 's/oldpattern/newString/' inputfile
+
+[root@node2 day4]# echo "101,Raj,sales,pune,3222" | sed 's/sales/prod/'
+101,Raj,prod,pune,3222
+[root@node2 day4]# echo "101,Raj,sales,pune,3222" | sed '/sales/c /prod/'
+/prod/
+[root@node2 day4]# echo "101,Raj,sales,pune,3222" | sed '/sales/c prod'
+prod
+[root@node2 day4]#
+[root@node2 day4]# echo "101,Raj,sales,pune,3222" | sed 's/sales/CRM/'
+101,Raj,CRM,pune,3222
+[root@node2 day4]#
+[root@node2 day4]# echo "101,Raj,sales,pune,3222" | sed 's/QA/CRM/'
+101,Raj,sales,pune,3222
+[root@node2 day4]# echo "101,raj,sales,sales,sales,pune,sales" |sed 's/sales/prod/'
+101,raj,prod,sales,sales,pune,sales
+[root@node2 day4]# echo "101,raj,sales,sales,sales,pune,sales" |sed 's/sales/prod/g'
+101,raj,prod,prod,prod,pune,prod
+[root@node2 day4]# echo "101,raj,sales,sales,sales,pune,Sales" |sed 's/sales/prod/g'
+101,raj,prod,prod,prod,pune,Sales
+[root@node2 day4]# echo "101,raj,sales,sales,sales,pune,Sales" |sed 's/sales/prod/gi'
+101,raj,prod,prod,prod,pune,prod
+[root@node2 day4]#
+[root@node2 day4]# echo "sales,sales,sales,sales" | sed 's/sales/***/'
+***,sales,sales,sales
+[root@node2 day4]# echo "sales,sales,sales,sales" | sed 's/sales/***/2'
+sales,***,sales,sales
+[root@node2 day4]# echo "sales,sales,sales,sales" | sed 's/sales/***/3'
+sales,sales,***,sales
+[root@node2 day4]# echo "sales,sales,sales,sales" | sed 's/sales/***/4'
+sales,sales,sales,***
+[root@node2 day4]# echo "sales,sales,sales,sales" | sed 's/sales/***/$'
+sed: -e expression #1, char 13: unknown option to `s'
+[root@node2 day4]# echo "sales,sales,sales,sales" | sed 's/sales/***/$'
+sed: -e expression #1, char 13: unknown option to `s'
+[root@node2 day4]# echo "sales,sales,sales,sales" | sed 's/sales/***/4'
+sales,sales,sales,***
+[root@node2 day4]# echo "sales,Sales,sales,sales" | sed 's/sales/***/'
+***,Sales,sales,sales
+[root@node2 day4]# echo "sales,Sales,sales,sales" | sed 's/sales/***/2i'
+sales,***,sales,sales
+[root@node2 day4]# cat -n emp.csv
+     1  101,raj,sales,pune,1000
+     2  102,leo,prod,bglore,2301
+     3  230,raj,prod,pune,2300
+     4  450,shan,sales,bglore,3401
+     5  542,anu,HR,mumbai,4590
+     6  321,bibu,sales,hyd,5419
+     7  651,ram,hr,bglore,3130
+     8  541,leo,admin,chennai,4913
+[root@node2 day4]# cat -n emp.csv| sed 's/sales/*****/'
+     1  101,raj,*****,pune,1000
+     2  102,leo,prod,bglore,2301
+     3  230,raj,prod,pune,2300
+     4  450,shan,*****,bglore,3401
+     5  542,anu,HR,mumbai,4590
+     6  321,bibu,*****,hyd,5419
+     7  651,ram,hr,bglore,3130
+     8  541,leo,admin,chennai,4913
+[root@node2 day4]# cat -n emp.csv| sed 's/sales/*****/2'
+     1  101,raj,sales,pune,1000
+     2  102,leo,prod,bglore,2301
+     3  230,raj,prod,pune,2300
+     4  450,shan,sales,bglore,3401
+     5  542,anu,HR,mumbai,4590
+     6  321,bibu,sales,hyd,5419
+     7  651,ram,hr,bglore,3130
+     8  541,leo,admin,chennai,4913
+[root@node2 day4]# cat -n emp.csv| sed 's/sales/*****/'
+     1  101,raj,*****,pune,1000
+     2  102,leo,prod,bglore,2301
+     3  230,raj,prod,pune,2300
+     4  450,shan,*****,bglore,3401
+     5  542,anu,HR,mumbai,4590
+     6  321,bibu,*****,hyd,5419
+     7  651,ram,hr,bglore,3130
+     8  541,leo,admin,chennai,4913
+[root@node2 day4]# cat -n emp.csv| sed -n 's/sales/*****/p'
+     1  101,raj,*****,pune,1000
+     4  450,shan,*****,bglore,3401
+     6  321,bibu,*****,hyd,5419
+[root@node2 day4]# cat -n emp.csv| sed -n 's/sales/*****/w r1.log'
+[root@node2 day4]# cat r1.log
+     1  101,raj,*****,pune,1000
+     4  450,shan,*****,bglore,3401
+     6  321,bibu,*****,hyd,5419
+[root@node2 day4]# cat -n emp.csv| sed -e 's/sales/*****/'  -e 's/prod/QA/'  -e 's/hyd/HYDERABAD/'
+     1  101,raj,*****,pune,1000
+     2  102,leo,QA,bglore,2301
+     3  230,raj,QA,pune,2300
+     4  450,shan,*****,bglore,3401
+     5  542,anu,HR,mumbai,4590
+     6  321,bibu,*****,HYDERABAD,5419
+     7  651,ram,hr,bglore,3130
+     8  541,leo,admin,chennai,4913
+==================================================================================
+
+ condition based replacement
+--------------------------------
+
+[root@node2 day4]# sed 's/sales/***/' emp.csv
+101,raj,***,pune,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,***,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,***,hyd,5419
+651,ram,hr,bglore,3130
+541,leo,admin,chennai,4913
+[root@node2 day4]#
+[root@node2 day4]# sed -n '1,5p' emp.csv
+101,raj,sales,pune,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+[root@node2 day4]#
+[root@node2 day4]# sed '1,5s/sales/***/' emp.csv
+101,raj,***,pune,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,***,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+651,ram,hr,bglore,3130
+541,leo,admin,chennai,4913
+[root@node2 day4]#
+[root@node2 day4]# sed -n '1,5s/sales/***/p' emp.csv
+101,raj,***,pune,1000
+450,shan,***,bglore,3401
+
+[root@node2 day4]# sed -n '/sales/p' emp.csv
+101,raj,sales,pune,1000
+450,shan,sales,bglore,3401
+321,bibu,sales,hyd,5419
+[root@node2 day4]#
+[root@node2 day4]# sed -n '/pune/p' emp.csv
+101,raj,sales,pune,1000
+230,raj,prod,pune,2300
+[root@node2 day4]#
+[root@node2 day4]# sed 's/pune/Noida/' emp.csv
+101,raj,sales,Noida,1000
+102,leo,prod,bglore,2301
+230,raj,prod,Noida,2300
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+651,ram,hr,bglore,3130
+541,leo,admin,chennai,4913
+[root@node2 day4]#
+[root@node2 day4]# sed '/sales/s/pune/Noida/' emp.csv
+101,raj,sales,Noida,1000
+102,leo,prod,bglore,2301
+230,raj,prod,pune,2300
+450,shan,sales,bglore,3401
+542,anu,HR,mumbai,4590
+321,bibu,sales,hyd,5419
+651,ram,hr,bglore,3130
+541,leo,admin,chennai,4913
+[root@node2 day4]# sed -n '/sales/s/pune/Noida/p' emp.csv
+101,raj,sales,Noida,1000
+
+
+===================================================================
+sed 's/sales/((&))/' emp.csv
+ps -e| sed -r 's/^[[:space:]].*(bash|net|python)/<<<&>>>/'
+---------------------------------------------------
+
+[root@node2 day4]# cat /var/log/messages | sed -n '/^Jul.*24.*07:32:05.*/,/^Jul.*24.*09:00:59.*/p'
+Jul 24 07:32:05 node2 dnf[2868]: Metadata cache created.
+Jul 24 07:32:05 node2 systemd[1]: dnf-makecache.service: Succeeded.
+Jul 24 07:32:05 node2 systemd[1]: Started dnf makecache.
+Jul 24 09:00:58 node2 systemd[1]: Starting dnf makecache...
+Jul 24 09:00:59 node2 dnf[3147]: Metadata timer caching disabled when running on a battery.
+[root@node2 day4]# cat /var/log/messages | sed -n '/^Jul.*24.*07:32:05.*/,/^Jul.*24.*09:00:59.*/w r1.log'
+[root@node2 day4]# cat r1.log
+Jul 24 07:32:05 node2 dnf[2868]: Metadata cache created.
+Jul 24 07:32:05 node2 systemd[1]: dnf-makecache.service: Succeeded.
+Jul 24 07:32:05 node2 systemd[1]: Started dnf makecache.
+Jul 24 09:00:58 node2 systemd[1]: Starting dnf makecache...
+Jul 24 09:00:59 node2 dnf[3147]: Metadata timer caching disabled when running on a battery.
+[root@node2 day4]#
+
+
+=========================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
