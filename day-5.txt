@@ -1,0 +1,777 @@
+grep
+----
+grep -option pattern inputfile
+
+pattern : string (or) Text
+action: print- display matched line
+
+-------------------------------------------------
+
+sed 
+----
+
+sed -option 'patternAction' inputfile
+
+pattern
+-------
+|-line number
+|- txt /text/
+
+Actions: print(p) write(w) delete(d) insert(I) append(a) change(c) execute(e) substitute(s)
+
+---------------------------------------------------------
+[root@node2 day5]# grep sales emp.csv
+101,raj,sales,pune,1000
+450,shan,sales,bglore,3401
+321,bibu,sales,hyd,5419
+[root@node2 day5]#
+[root@node2 day5]# sed -n '/sales/p' emp.csv
+101,raj,sales,pune,1000
+450,shan,sales,bglore,3401
+321,bibu,sales,hyd,5419
+[root@node2 day5]#
+[root@node2 day5]# awk '/sales/{print}' emp.csv
+101,raj,sales,pune,1000
+450,shan,sales,bglore,3401
+321,bibu,sales,hyd,5419
+[root@node2 day5]# ls
+
+-------------------------------------
+awk
+---
+
+awk -option '/Pattern/Action' inputfile
+pattern : text (or) String
+action: print
+
+------------------------------------------------------
+awk -> 2 ways
+------------
+
+awk - commandline like grep, sed
+
+awk - programming language-->   variables, operators, conditional stmts, looping, functions..
+
+==================================================================================================
+
+
+awk internal operations
+-----------------------
+step1: READ - read input data from <INPUT> - stores line by line in record buffer
+
+step2: SPLIT - split each record into multiple fields based on delimiters specified. 
+               default delimiter is space. ;  -F<sep>;
+step3: search the pattern
+
+step 4: Action-{print}
+
+
+IP
+----
+userA:bin:bash
+userB:bin:ksh
+userC:bin:bash
+------------
+
+awk -option '/pattern/{print}' Inputfile
+
+awk -F: '/bash/{print}' IP
+
+step1: read
+------
+1 userA:bin:bash
+----------------
+2.userB:bin:ksh
+---------------
+3.userC:bin:bash
+-----------------
+
+step 2 : split based on -F:
+-----
+
+1 userA|bin|bash
+-------|---|----
+2.userB|bin|ksh
+-------|---|---
+3.userC|bin|bash
+-------|---|-----
+
+step 3:
+------
+ pattern  /bash/
+
+NR  $1   $2   $3 (or) $NF
+1 userA|bin|bash
+-------|---|----
+3.userC|bin|bash
+-------|---|-----
+|------ $0------|
+        |-----------record
+step 4
+------
+print
+
+
+awk -F: '/bash/{print}' IP   - same  as grep
+userA:bin:bash
+userB:bin:bash
+
+awk -F:  '/bash/{print NR,$1,$3}' IP       vs grep
+1 userA bash
+3 userC bash
+------------------// default OFS output Field Separator is space
+
+awk -F:  '/bash/{OFS="," ; print NR,$1,$3}' IP       vs grep
+1,userA,bash
+3,userC,bash
+  
+grep->  search only
+sed -> search--> print, write,append,execute...
+awk-> search + format
+                |------table -- RXC
+--------
+ awk -F: '/bash/{print}' IP2
+userA:bin:bash
+userC:bin:bash
+[root@node2 day5]# grep bash IP2
+userA:bin:bash
+userC:bin:bash
+[root@node2 day5]#
+[root@node2 day5]# awk -F: '/bash/{print NR,$1,$3}' IP2
+1 userA bash
+3 userC bash
+[root@node2 day5]# awk -F: '/bash/{OFS="," ; print NR,$1,$3}' IP2
+1,userA,bash
+3,userC,bash
+[root@node2 day5]# cat IP2
+userA:bin:bash
+userB:bin:ksh
+userC:bin:bash
+[root@node2 day5]# awk -F: '/bash/{OFS="||" ; print NR,$1,$3}' IP2
+1||userA||bash
+3||userC||bash
+[root@node2 day5]# awk -F: '/bash/{OFS="|" ; print NR,$1,$3}' IP2
+1|userA|bash
+3|userC|bash
+[root@node2 day5]# free -m
+              total        used        free      shared  buff/cache   available
+Mem:           3729         260        2636           8         832        3234
+Swap:          4767           0        4767
+[root@node2 day5]# free -m| awk '{print $2}'
+used
+3729
+4767
+[root@node2 day5]# free -m|sed '1d'used awk '{print $2}'
+sed: -e expression #1, char 3: extra characters after command
+[root@node2 day5]# free -m|sed '1d'| awk '{print $2}'
+3729
+4767
+[root@node2 day5]# T=(`free -m | sed '1d' | awk '{print $2}')
+> T=(`free -m | sed '1d' | awk '{print $2}'`)
+-bash: syntax error near unexpected token `|'
+[root@node2 day5]# T=(`free -m | sed '1d' | awk '{print $2}'`)
+[root@node2 day5]# echo ${T[@]}
+3729 4767
+[root@node2 day5]#
+
+--------
+
+Task
+----
+
+Write a shellcript
+
+|
+create a menulist
+|
+use select loop and case
+
+|
+memory
+|---> used--> create used array - create a function that calculate sum of used values
+|----> free -> create free array - create a function that calculate sum of free values
+|----> total -> create total array - create a function that calculate sum of total values
+
+
+------------------------------
+
+
+PS3="Select Your Choice : "
+
+f(){
+
+        t=0
+        for var in $@
+        do
+                t=`expr $var + $t`
+        done
+}
+
+select menu in total used free quit
+do
+        case $menu in
+        total) T=(`free -m | sed '1d' | awk '{print $2}'`)
+                f ${T[@]}
+                echo "Total memory: $t MB"
+                ;;
+
+
+        used) U=(`free -m | sed '1d' | awk '{print $3}'`)
+                f ${U[@]}
+                echo "Total Used memory: $t MB"
+                ;;
+
+
+        free) F=(`free -m | sed '1d' | awk '{print $4}'`)
+                f ${F[@]}
+                echo "Total Free memory: $t MB"
+                ;;
+
+
+        quit)
+                echo "ThankYou !!"
+                exit
+                ;;
+        *) echo "Invalid Choice"
+           echo "Press Enter key"
+     esac
+done
+-----------------------------
+# Filter filename and file size and write to a new file.
+#=====================================================
+[root@node2 day5]# ls -l| sed '1d' | awk '{OFS=","; print $NF,$5}'> r.log
+[root@node2 day5]# cat r.log
+emp.csv,196
+IP,179
+IP1,45
+IP2,44
+p1.sh,603
+r.log,0
+[root@node2 day5]# sed '1i filename,filesize' r.log
+filename,filesize
+emp.csv,196
+IP,179
+IP1,45
+IP2,44
+p1.sh,603
+r.log,0
+[root@node2 day5]# cat r.log
+emp.csv,196
+IP,179
+IP1,45
+IP2,44
+p1.sh,603
+r.log,0
+
+---------------------------
+# Filter top 3 largest file based on file size
+#============================================
+[root@node2 day5]# ls -l | sed '1d' | awk '{print $NF,$5}'
+emp.csv 196
+IP 179
+IP1 45
+IP2 44
+p1.sh 603
+r.log 51
+[root@node2 day5]# ls -l | sed '1d' | awk '{print $NF,$5}'| sort -nrk 2
+p1.sh 603
+emp.csv 196
+IP 179
+r.log 51
+IP1 45
+IP2 44
+[root@node2 day5]# ls -l | sed '1d' | awk '{print $NF,$5}'| sort -nrk 2 | sed -n '1,3 p'
+p1.sh 603
+emp.csv 196
+IP 179
+[root@node2 day5]#
+
+------------------------------------------
+Regx with awk
+-------------
+[root@node2 day5]# grep "^[1-3].*(sales|prod).*00$" emp.csv
+[root@node2 day5]# grep -E "^[1-3].*(sales|prod).*00$" emp.csv
+101,raj,sales,pune,1000
+230,raj,prod,pune,2300
+[root@node2 day5]# sed -n '/^[1-3].*(sales|prod).*00$/p' emp.csv
+[root@node2 day5]# sed -nr '/^[1-3].*(sales|prod).*00$/p' emp.csv
+101,raj,sales,pune,1000
+230,raj,prod,pune,2300
+[root@node2 day5]# awk -F, '/^[1-3].*(sales|prod).*00$/{print NR, $1,$3}' emp.csv
+1 101 sales
+3 230 prod
+--------------------
+IP
+---
+userA:bin,bash
+userB,bin-ksh
+userC(bin)bash
+---
+
+awk -F: '{print $1}' IP
+
+Read
+Split
+
+userA|bin,bash   =>   userA
+userB,bin-ksh    =>   userB,bin-ksh
+userC(bin)bash   =>   userC(bin)bash
+
+
+IP
+---
+userA:bin,bash
+userB,bin-ksh
+userC(bin)bash
+---
+awk -F, '{print $1}' IP
+		=>  userA:bin
+                => userB
+                => userC(bin)bash
+
+
+awk -F"[:,|]"
+
+vs
+
+awk -F "[[:punct:]]"
+vs
+
+awk -F"[^a-zA-Z0-9]" {print $1}'  IP
+
+read
+split=> match all special charc/   => userA
+                                      userB
+                                      userC
+
+
+-------------------------------
+[root@node2 day5]# cat IP1
+userA:bin,bash
+userB,bin-ksh
+userC(bin)bash
+
+[root@node2 day5]# awk -F: '{print $1}' IP1
+userA
+userB,bin-ksh
+userC(bin)bash
+
+[root@node2 day5]# awk -F, '{print $1}' IP1
+userA:bin
+userB
+userC(bin)bash
+
+[root@node2 day5]# awk -F"[:,(]" '{print $1}' IP1
+userA
+userB
+userC
+
+[root@node2 day5]# awk -F"[[:punct:]]" '{print $1}' IP1
+userA
+userB
+userC
+
+[root@node2 day5]# awk -F"[^a-zA-Z0-9]" '{print $1}' IP1
+userA
+userB
+userC
+
+---------------------------------------------
+[root@node2 day5]# cat IP3
+101:prod1:1000(x
+102:prod2-2000|y
+103:prod3(3000,y
+104:prod4:4000(x
+
+[root@node2 day5]# sed 's/[[:punct:]]//' IP3
+101prod1:1000(x
+102prod2-2000|y
+103prod3(3000,y
+104prod4:4000(x
+[root@node2 day5]# sed 's/[[:punct:]]//g' IP3
+101prod11000x
+102prod22000y
+103prod33000y
+104prod44000x
+[root@node2 day5]# sed 's/[[:punct:]]/ /g' IP3
+101 prod1 1000 x
+102 prod2 2000 y
+103 prod3 3000 y
+104 prod4 4000 x
+[root@node2 day5]# sed 's/[[:punct:]]/ /g' IP3 > IP4
+[root@node2 day5]# cat IP4
+101 prod1 1000 x
+102 prod2 2000 y
+103 prod3 3000 y
+104 prod4 4000 x
+[root@node2 day5]# awk '{print $1}' IP4
+101
+102
+103
+104
+[root@node2 day5]# awk '{print $2}' IP4
+prod1
+prod2
+prod3
+prod4
+
+------------------------------------------
+F
+OFS
+default record separator \n
+RS
+ORS
+------
+[root@node2 day5]# cat IP
+userA:bin,bash
+userB,bin,ksh
+[root@node2 day5]# awk -F, '{print $1}' IP
+userA:bin
+userB
+[root@node2 day5]# awk -F, '{ORS ="-"; print $1}' IP
+userA:bin-userB-[root@node2 day5]# awk -F, '{ORS ="--"; print $1}' IP
+userA:bin--userB--[root@node2 day5]# awk -F, '{ORS ="--\n"; print $1}' IP
+userA:bin--
+userB--
+[root@node2 day5]# awk -F, '{ORS ="--\n--"; print $1}' IP
+userA:bin--
+--userB--
+--[root@node2 day5]#
+[root@node2 day5]#
+
+----------
+
+OFS - Output Field Separator
+RS - Input Record separator
+ORS - Output Record Separator
+$NF - last column
+NF - total no. of fields
+--------------------------
+[root@node2 day5]# cat IP
+userA:bin,bash
+userB,bin,ksh
+[root@node2 day5]# awk -F, '{print $1}' IP
+userA:bin
+userB
+[root@node2 day5]# awk -F, '{ORS ="-"; print $1}' IP
+userA:bin-userB-[root@node2 day5]# awk -F, '{ORS ="--"; print $1}' IP
+userA:bin--userB--[root@node2 day5]# awk -F, '{ORS ="--\n"; print $1}' IP
+userA:bin--
+userB--
+[root@node2 day5]# awk -F, '{ORS ="--\n--"; print $1}' IP
+userA:bin--
+--userB--
+--[root@node2 day5]#
+[root@node2 day5]#
+------------------------------------------------------------------------
+
+awk supports Arithmetic, Relational and Logical operations
+---------------------------------------------------------
+- user defined variables
+- operators
+- conditional
+- looping
+- array
+- function
+
+Operators
+---------
+
+[root@node2 day5]# cat -n emp.csv
+     1  101,raj,sales,pune,1000
+     2  102,leo,prod,bglore,2301
+     3  230,raj,prod,pune,2300
+     4  450,shan,sales,bglore,3401
+     5  542,anu,HR,mumbai,4590
+     6  321,bibu,sales,hyd,5419
+     7  651,ram,hr,bglore,3130
+     8  541,leo,admin,chennai,4913
+[root@node2 day5]#
+[root@node2 day5]# awk -F, '/sales/{print NR,$2,$3,$NF}'
+emp.csv
+
+^C
+[root@node2 day5]# awk -F, '/sales/{print NR,$2,$3,$NF}' emp.csv
+1 raj sales 1000
+4 shan sales 3401
+6 bibu sales 5419
+[root@node2 day5]# awk -F, '/sales/{print NR,$2,$3,$NF,$NF*0.18}' emp.csv
+1 raj sales 1000 180
+4 shan sales 3401 612.18
+6 bibu sales 5419 975.42
+[root@node2 day5]#
+
+-------------------------------------------------------
+relational operators		Logical operators
+-------------------             -------------------
+==					&&
+!=					||
+<					!
+>
+<=
+>=
+
+
+awk  support C style code
+[root@node2 day5]# awk -F, '/sales/{OFS="\t"; print NR, $1, $2,$NF, $NF * 0.12 }' emp.csv
+1       101     raj     1000    120
+4       450     shan    3401    408.12
+6       321     bibu    5419    650.28
+[root@node2 day5]# awk -F, '/sales/{printf("%d\t%d\t%d\t%d\t%f\n", NR, $1, $2,$NF, $NF * 0.12) }' emp.csv
+1       101     0       1000    120.000000
+4       450     0       3401    408.120000
+6       321     0       5419    650.280000
+[root@node2 day5]# awk -F, '/sales/{printf("%d\t%d\t%d\t%d\t%0.2f\n", NR, $1, $2,$NF, $NF * 0.12) }' emp.csv
+1       101     0       1000    120.00
+4       450     0       3401    408.12
+6       321     0       5419    650.28
+[root@node2 day5]# awk -F, '/sales/{printf("%d\t%d\t%d\t%d\t%0.3f\n", NR, $1, $2,$NF, $NF * 0.12) }' emp.csv
+1       101     0       1000    120.000
+4       450     0       3401    408.120
+6       321     0       5419    650.280
+[root@node2 day5]#
+[root@node2 day5]# awk -F, '$NF > 3000 && $NF < 5000 { OFS="\t-\t"; print NR, $1, $2, $NF, $NF*0.12}' emp.csv
+4       -       450     -       shan    -       3401    -       408.12
+5       -       542     -       anu     -       4590    -       550.8
+7       -       651     -       ram     -       3130    -       375.6
+8       -       541     -       leo     -       4913    -       589.56
+[root@node2 day5]# ls -l
+total 36
+-rw-r--r--. 1 root root 196 Jul 24 11:11 emp.csv
+-rw-r--r--. 1 root root  29 Jul 24 13:57 IP
+-rw-r--r--. 1 root root  45 Jul 24 11:18 IP1
+-rw-r--r--. 1 root root  44 Jul 24 11:57 IP2
+-rw-r--r--. 1 root root  68 Jul 24 13:48 IP3
+-rw-r--r--. 1 root root  68 Jul 24 13:49 IP4
+-rwxr-xr-x. 1 root root 603 Jul 24 12:48 p1.sh
+-rwxr-xr-x. 1 root root 214 Jul 24 14:22 p2.sh
+-rw-r--r--. 1 root root  51 Jul 24 13:19 r.log
+[root@node2 day5]# ls -l | sed '1d' | awk ' $5 > 100 && $5 < 300{ OFS="\t";print $NF, $5}'
+emp.csv 196
+p2.sh   214
+[root@node2 day5]# awk -F, 'NR==5{print}' emp.csv
+542,anu,HR,mumbai,4590
+[root@node2 day5]# awk -F, 'NR > 5{print}' emp.csv
+321,bibu,sales,hyd,5419
+651,ram,hr,bglore,3130
+541,leo,admin,chennai,4913
+[root@node2 day5]# awk -F, 'NR > 5{print NR}' emp.csv
+6
+7
+8
+[root@node2 day5]# awk -F, 'NR > 5{print $4}' emp.csv
+hyd
+bglore
+chennai
+[root@node2 day5]# awk -F, 'NR >= 5{print $4}' emp.csv
+mumbai
+hyd
+bglore
+chennai
+[root@node2 day5]#
+================================================================================
+
+awk programming - filename .awk
+==================================
+
+BEGIN{ initialization block }    - not depend on input - pre processing block
+
+/pattern/{Action}     - depends on input  - Main Body Block
+
+END{ footer block } - not depends on input block but it depends on body block- post processing block
+
+
+awk -f filename.awk inputfile
+
+-F<sep> =>cmdline         VS        FS=<sep>    ==========> (inside .awk file)
+
+-F< sep> => cmdline        VS        -f < attach awk script file>   => cmdline 
+
+----------------------------------------------------------------------------------
+[root@node2 day5]# date|wc -l
+1
+[root@node2 day5]# date|awk '{print Hello}'
+
+[root@node2 day5]# date|awk '{print "Hello"}'
+Hello
+[root@node2 day5]# cal|wc -l
+8
+[root@node2 day5]# cal|awk '{print "Hello"}'
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+[root@node2 day5]# date|awk 'BEGIN{print "Hello"}'
+Hello
+[root@node2 day5]# awk 'BEGIN{print "Hello"}'
+Hello
+[root@node2 day5]# clear
+[root@node2 day5]#
+[root@node2 day5]#
+[root@node2 day5]#
+[root@node2 day5]# awk -F, '/sales/{OFS="\t";print NR,$1,$2,$NF,$NF*0.2}' emp.csv
+1       101     raj     1000    200
+4       450     shan    3401    680.2
+6       321     bibu    5419    1083.8
+[root@node2 day5]#
+[root@node2 day5]# cat > p1.awk
+BEGIN{
+print "-------------------- List of Sales EMp's Record  -----------------------"
+FS=","
+OFS="\t"
+}
+
+/sales/{print NR,$1,$2,$NF,$NF*0.2}                                                                
+END{
+print "------------------------ Thank You     !!!!!    --------------------------"
+}
+^C
+[root@node2 day5]# cat p1.awk
+BEGIN{
+print "-------------------- List of Sales EMp's Record  -----------------------"
+FS=","
+OFS="\t"
+}
+
+/sales/{print NR,$1,$2,$NF,$NF*0.2}
+
+END{
+print "------------------------ Thank You     !!!!!    --------------------------"
+}
+[root@node2 day5]# awk -f p1.awk emp.csv
+-------------------- List of Sales EMp's Record  -----------------------
+1       101     raj     1000    200
+4       450     shan    3401    680.2
+6       321     bibu    5419    1083.8
+------------------------ Thank You     !!!!!    --------------------------
+[root@node2 day5]# awk -F, '/sales/{OFS="\t";print NR,$1,$2,$NF,$NF*0.2}' emp.csv
+1       101     raj     1000    200
+4       450     shan    3401    680.2
+6       321     bibu    5419    1083.8
+
+[root@node2 day5]# cat p1.awk
+BEGIN{
+print "-------------------- List of Sales EMp's Record  -----------------------"
+FS=","
+OFS="\t"
+}
+
+/sales/{print NR,$1,$2,$NF,$NF*0.2}
+
+END{
+print "------------------------ Thank You     !!!!!    --------------------------"
+}
+[root@node2 day5]#
+
+=================================================================================================
+
+Array
+=====
+array - variable - hold more values
+
+Index--> user defined indexing
+Index -> starts with 1
+
+Syntax:-
+arrayName[Index]=value
+
+
+
+for(index in Array){
+	Array[index]
+}
+# for in  keywords
+
+============================
+Task
+---
+
+Inventory file
+==============
+
+---------------------------------
+Itemcode : Sales count
+---------------------------------
+101: 10,20,30,40,50
+--------------------------------
+102: 20,100
+-------------------------------
+103: 300,150,20
+------------------------------
+104: 1000,2000
+--------------------------------
+
+
+read input file - line by line
+|
+based on -F:  split $2 value is multiple (array)
+
+display ==> Itemcode     Sum of Sales Count
+            101           150
+            102           120
+
+
+==============================================================================================
+
+Here document (or) line oriented doc
+
+ShellScript ---------------------------> Database
+-command                                 SQL
+|-----------------------------------------|
+
+
+<<Abc
+…
+…
+This is a Multiline Comment
+…
+Abc
+
+VS
+
+command<<Abc
+…             Here doc
+…
+Abc
+
+==============================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
